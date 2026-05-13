@@ -1,4 +1,5 @@
 import { siteConfig } from '@/config/site';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import './globals.css';
 
 // ─── Server-side Metadata (crawlers see this immediately) ─────
@@ -172,6 +173,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <GoogleAnalytics />
         {children}
       </body>
     </html>
