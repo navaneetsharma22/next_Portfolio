@@ -1,0 +1,219 @@
+"use client";
+
+import React, { memo, useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Download, Send, ExternalLink, FileText } from 'lucide-react';
+import { FaRocket } from 'react-icons/fa';
+import { LazyImage } from './ui/Shared';
+import ResumeModal from './ui/ResumeModal';
+import heroService from '../services/heroService';
+import { useCursor } from '../context/CursorContext';
+
+/**
+ * TypingAnimation Component
+ * Handles the dynamic text rotation for the hero section
+ */
+const TypingAnimation = ({ phrases }) => {
+  const [index, setIndex] = useState(0);
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const typingSpeed = isDeleting ? 50 : 100;
+  const pauseTime = 2000;
+
+  useEffect(() => {
+    if (!phrases || phrases.length === 0) return;
+
+    const currentPhrase = phrases[index];
+    
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        setDisplayText(currentPhrase.substring(0, displayText.length + 1));
+        if (displayText.length === currentPhrase.length) {
+          setTimeout(() => setIsDeleting(true), pauseTime);
+        }
+      } else {
+        setDisplayText(currentPhrase.substring(0, displayText.length - 1));
+        if (displayText.length === 0) {
+          setIsDeleting(false);
+          setIndex((prev) => (prev + 1) % phrases.length);
+        }
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [displayText, isDeleting, index, phrases]);
+
+  return (
+    <span className="text-primary font-bold min-h-[1.5em] inline-block">
+      {displayText}
+      <span className="animate-pulse ml-1 text-primary">|</span>
+    </span>
+  );
+};
+
+const Hero = memo(() => {
+  const [heroData, setHeroData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const { setCursor } = useCursor();
+
+  const fetchHeroData = async () => {
+    try {
+      const data = await heroService.getHeroData();
+      setHeroData(data);
+    } catch (err) {
+      console.error('Failed to fetch hero data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHeroData();
+  }, []);
+
+  const scrollToSection = useCallback((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  }, []);
+
+  const phrases = [
+    'MERN Stack Developer',
+    'React Developer',
+    'Full Stack Engineer',
+    'Node.js Developer'
+  ];
+
+  const resumeUrl = heroData?.resumeUrl ? 
+    (heroData.resumeUrl.startsWith('http') ? heroData.resumeUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}${heroData.resumeUrl}`) 
+    : null;
+
+  return (
+    <section
+      id="home"
+      className="min-h-screen flex items-center overflow-hidden relative pt-24 pb-32 lg:pt-40 lg:pb-60"
+      style={{
+        background: `
+          radial-gradient(circle at 12% 100%, rgba(255, 226, 176, 0.96) 1%, rgba(255, 226, 176, 0.96) 5px, transparent 15%),
+          radial-gradient(circle at 95% -15%, rgba(218, 77, 241, 0.4) 5%, transparent 30%),
+          radial-gradient(circle at 100%, rgba(196, 245, 233, 0.7) 2%, transparent 35%),
+          #ffffff
+        `,
+      }}
+      aria-label="Hero section"
+    >
+      <div
+        className="mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center w-full relative z-10"
+        style={{ maxWidth: '1320px' }}
+      >
+        {/* Left — Content */}
+        <div className="flex flex-col h-full justify-center items-center lg:items-start text-center lg:text-left">
+          {isLoading ? (
+            <div className="space-y-8 w-full flex flex-col items-center lg:items-start">
+              <div className="w-48 h-8 bg-gray-100 animate-pulse" />
+              <div className="w-full max-w-[600px] h-24 bg-gray-100 animate-pulse" />
+              <div className="w-64 h-6 bg-gray-100 animate-pulse" />
+              <div className="flex gap-4">
+                <div className="w-40 h-14 bg-gray-100 animate-pulse" />
+                <div className="w-40 h-14 bg-gray-100 animate-pulse" />
+              </div>
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center lg:items-start"
+            >
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 border border-border/50 backdrop-blur-sm w-fit mb-8"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex h-2 w-2 bg-green-500"></span>
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-body">Available for Projects</span>
+              </motion.div>
+
+              <h1 className="font-bold leading-[1.1] mb-6 tracking-tighter text-heading text-4xl sm:text-5xl lg:text-7xl">
+                Hello, I'm <br />
+                {heroData?.title || 'Navaneet Sharma'}
+              </h1>
+
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-heading/80 mb-8 flex items-center gap-3">
+                I'm a <TypingAnimation phrases={phrases} />
+              </div>
+
+              <p className="text-lg leading-relaxed text-body mb-12 max-w-[520px]">
+                {heroData?.description || "Crafting high-performance web applications with the MERN stack. I turn complex problems into elegant, scalable digital solutions."}
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-4 items-center justify-center lg:justify-start">
+                <button
+                  onClick={() => window.open('https://www.linkedin.com/in/navaneet-sharma-750b50357/', '_blank')}
+                  onMouseEnter={() => setCursor('hover')}
+                  onMouseLeave={() => setCursor('default')}
+                  className="btn-picto !rounded-none py-4 px-10 group"
+                >
+                  Hire Me
+                  <Send size={18} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                <button 
+                  onClick={() => setIsResumeOpen(true)}
+                  onMouseEnter={() => setCursor('hover')}
+                  onMouseLeave={() => setCursor('default')}
+                  className="btn-picto-outline"
+                >
+                  <FileText size={20} />
+                  View Resume
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Right — Photo Card */}
+        <div className="relative flex justify-center items-center">
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-primary/10 blur-3xl -z-10" />
+            <div
+              className="bg-white overflow-hidden w-full max-w-[500px] lg:max-w-none"
+              style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.06)', aspectRatio: '4/5' }}
+            >
+              <LazyImage
+                src={heroData?.profileImage || "/assets/navaneet.jpg"}
+                alt={heroData?.title || "Navaneet Sharma"}
+                className="w-full h-full object-cover object-top"
+                priority={true}
+              />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <ResumeModal 
+        isOpen={isResumeOpen}
+        onClose={() => setIsResumeOpen(false)}
+        resumeUrl={resumeUrl}
+      />
+    </section>
+  );
+});
+
+Hero.displayName = 'Hero';
+
+export default Hero;

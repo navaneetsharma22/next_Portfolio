@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9929fb"/>
+      <stop offset="1" stop-color="#4f46e5"/>
+    </linearGradient>
+  </defs>
+  <!-- Organic blob shape matching the preloader -->
+  <path d="M16 2.5C21.6 2.5 29.5 7.1 29.5 16C29.5 24.9 22.4 29.5 16 29.5C9.6 29.5 2.5 24.9 2.5 16C2.5 7.1 10.4 2.5 16 2.5Z" fill="url(#grad)"/>
+  <!-- Glossy overlay -->
+  <path d="M16 2.5C21.6 2.5 29.5 7.1 29.5 16C29.5 19 28.5 21.5 26.5 23.5L5.5 8.5C7.5 5.5 11 2.5 16 2.5Z" fill="white" fill-opacity="0.1"/>
+  <!-- Letter N -->
+  <text x="16" y="22" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="17" style="letter-spacing: -1px;">N</text>
+</svg>
