@@ -1,7 +1,6 @@
 "use client";
 
 import React, { memo, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { AnimatedReveal } from './ui/Shared';
 
@@ -48,13 +47,7 @@ const CTA = memo(() => {
             </a>
 
             {/* Thought of the Day Card */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="relative p-8 bg-white/[0.03] border border-white/10 max-w-2xl w-full group overflow-hidden"
-            >
+            <AnimatedReveal direction="up" delay={0.3} className="relative p-8 bg-white/[0.03] border border-white/10 max-w-2xl w-full group overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6 text-left">
                 <div className="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary shrink-0">
@@ -114,7 +107,7 @@ const CTA = memo(() => {
                 </div>
               </div>
               <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-            </motion.div>
+            </AnimatedReveal>
           </div>
         </AnimatedReveal>
       </div>

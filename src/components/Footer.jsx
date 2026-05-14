@@ -1,11 +1,19 @@
 "use client";
 
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import heroService from '../services/heroService';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const Footer = memo(() => {
   const currentYear = new Date().getFullYear();
   const [heroData, setHeroData] = useState(null);
+  const footerRef = useRef(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
     const fetchHeroData = async () => {
@@ -19,12 +27,34 @@ const Footer = memo(() => {
     fetchHeroData();
   }, []);
 
-  const footerLinks = ['Home', 'Projects', 'Skills', 'Contact'];
+  // ── GSAP Footer Reveal ──
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(contentRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
+    }, footerRef);
+
+    return () => ctx.revert();
+  }, [heroData]);
+
+  const footerLinks = ['Home', 'About', 'Projects', 'Experience', 'Skills', 'Contact'];
   const fullName = heroData?.title || 'Navaneet sharma';
   const brandName = fullName;
 
   return (
     <footer
+      ref={footerRef}
       className="relative z-0 pb-8"
       style={{
         backgroundColor: '#132238',
@@ -32,7 +62,7 @@ const Footer = memo(() => {
       }}
       role="contentinfo"
     >
-      <div className="mx-auto px-6 w-full" style={{ maxWidth: '1320px' }}>
+      <div ref={contentRef} className="mx-auto px-6 w-full" style={{ maxWidth: '1320px', opacity: 0 }}>
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 mb-10">
 
           {/* Brand - Left */}
@@ -68,14 +98,14 @@ const Footer = memo(() => {
           </div>
         </div>
 
-        {/* Credit Section (Line Removed) */}
+        {/* Credit Section */}
         <div className="mt-4 text-center text-sm font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
           Developed with <span className="text-red-500" aria-label="love">♥</span> by{' '}
           <a href="#" className="text-white font-bold hover:underline">{fullName}</a>
         </div>
       </div>
 
-      {/* Decorative Background Text: Ultra-Refined Style */}
+      {/* Decorative Background Text */}
       <div 
         className="absolute bottom-4 left-6 leading-none select-none pointer-events-none z-[-1] font-black tracking-[0.5em] opacity-5"
         style={{ 

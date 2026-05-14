@@ -1,13 +1,17 @@
 "use client";
 
-import React, { memo, useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, Send, ExternalLink, FileText } from 'lucide-react';
-import { FaRocket } from 'react-icons/fa';
+import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
+import { Send, FileText } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LazyImage } from './ui/Shared';
 import ResumeModal from './ui/ResumeModal';
 import heroService from '../services/heroService';
 import { useCursor } from '../context/CursorContext';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
  * TypingAnimation Component
@@ -58,6 +62,16 @@ const Hero = memo(() => {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { setCursor } = useCursor();
 
+  // Refs for GSAP entrance animations
+  const sectionRef = useRef(null);
+  const badgeRef = useRef(null);
+  const headingRef = useRef(null);
+  const typingRef = useRef(null);
+  const descRef = useRef(null);
+  const buttonsRef = useRef(null);
+  const imageRef = useRef(null);
+  const imageContainerRef = useRef(null);
+
   const fetchHeroData = async () => {
     try {
       const data = await heroService.getHeroData();
@@ -72,6 +86,88 @@ const Hero = memo(() => {
   useEffect(() => {
     fetchHeroData();
   }, []);
+
+  // ── GSAP Entrance Animations (ThoughtWorks-style) ──
+  useEffect(() => {
+    if (isLoading) return;
+    
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out' }
+      });
+
+      // Badge — scale + fade
+      if (badgeRef.current) {
+        tl.fromTo(badgeRef.current,
+          { opacity: 0, scale: 0.8, y: 15 },
+          { opacity: 1, scale: 1, y: 0, duration: 0.6 },
+          0.2
+        );
+      }
+
+      // Heading — clip-path reveal from bottom
+      if (headingRef.current) {
+        tl.fromTo(headingRef.current,
+          { opacity: 0, y: 50, clipPath: 'inset(0 0 100% 0)' },
+          { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 1 },
+          0.3
+        );
+      }
+
+      // Typing area — fade up
+      if (typingRef.current) {
+        tl.fromTo(typingRef.current,
+          { opacity: 0, y: 25 },
+          { opacity: 1, y: 0, duration: 0.7 },
+          0.55
+        );
+      }
+
+      // Description — fade up
+      if (descRef.current) {
+        tl.fromTo(descRef.current,
+          { opacity: 0, y: 25 },
+          { opacity: 1, y: 0, duration: 0.7 },
+          0.65
+        );
+      }
+
+      // Buttons — staggered fade up
+      if (buttonsRef.current) {
+        const buttons = buttonsRef.current.children;
+        tl.fromTo(buttons,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
+          0.8
+        );
+      }
+
+      // Image — slide from right + scale
+      if (imageContainerRef.current) {
+        tl.fromTo(imageContainerRef.current,
+          { opacity: 0, x: 60, scale: 0.95 },
+          { opacity: 1, x: 0, scale: 1, duration: 1 },
+          0.3
+        );
+      }
+
+      // Parallax on image while scrolling
+      if (imageRef.current) {
+        gsap.to(imageRef.current, {
+          yPercent: -6,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.5,
+          },
+        });
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [isLoading]);
 
   const scrollToSection = useCallback((id) => {
     const el = document.getElementById(id);
@@ -94,6 +190,7 @@ const Hero = memo(() => {
 
   return (
     <section
+      ref={sectionRef}
       id="home"
       className="min-h-screen flex items-center overflow-hidden relative pt-24 pb-32 lg:pt-40 lg:pb-60"
       style={{
@@ -123,45 +220,52 @@ const Hero = memo(() => {
               </div>
             </div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-center lg:items-start"
-            >
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
+            <div className="flex flex-col items-center lg:items-start">
+              <div 
+                ref={badgeRef}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 border border-border/50 backdrop-blur-sm w-fit mb-8"
+                style={{ opacity: 0 }}
               >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex h-2 w-2 bg-green-500"></span>
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-body">Available for Projects</span>
-              </motion.div>
+              </div>
 
-              <h1 className="font-bold leading-[1.1] mb-6 tracking-tighter text-heading text-4xl sm:text-5xl lg:text-7xl">
+              <h1 
+                ref={headingRef}
+                className="font-bold leading-[1.1] mb-6 tracking-tighter text-heading text-4xl sm:text-5xl lg:text-7xl"
+                style={{ opacity: 0, willChange: 'clip-path, transform' }}
+              >
                 Hello, I'm <br />
                 {heroData?.title || 'Navaneet Sharma'}
               </h1>
 
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-heading/80 mb-8 flex items-center gap-3">
+              <div 
+                ref={typingRef}
+                className="text-lg sm:text-xl md:text-2xl font-bold text-heading/80 mb-8 flex items-center gap-3"
+                style={{ opacity: 0 }}
+              >
                 I'm a <TypingAnimation phrases={phrases} />
               </div>
 
-              <p className="text-lg leading-relaxed text-body mb-12 max-w-[520px]">
+              <p 
+                ref={descRef}
+                className="text-lg leading-relaxed text-body mb-12 max-w-[520px]"
+                style={{ opacity: 0 }}
+              >
                 {heroData?.description || "Crafting high-performance web applications with the MERN stack. I turn complex problems into elegant, scalable digital solutions."}
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4 items-center justify-center lg:justify-start">
+              <div ref={buttonsRef} className="flex flex-wrap gap-4 items-center justify-center lg:justify-start">
                 <button
                   onClick={() => window.open('https://www.linkedin.com/in/navaneet-sharma-750b50357/', '_blank')}
                   onMouseEnter={() => setCursor('hover')}
                   onMouseLeave={() => setCursor('default')}
                   className="btn-picto !rounded-none py-4 px-10 group"
+                  style={{ opacity: 0 }}
                 >
                   Hire Me
                   <Send size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -172,25 +276,26 @@ const Hero = memo(() => {
                   onMouseEnter={() => setCursor('hover')}
                   onMouseLeave={() => setCursor('default')}
                   className="btn-picto-outline"
+                  style={{ opacity: 0 }}
                 >
                   <FileText size={20} />
                   View Resume
                 </button>
               </div>
-            </motion.div>
+            </div>
           )}
         </div>
 
         {/* Right — Photo Card */}
         <div className="relative flex justify-center items-center">
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          <div
+            ref={imageContainerRef}
             className="relative"
+            style={{ opacity: 0 }}
           >
             <div className="absolute inset-0 bg-primary/10 blur-3xl -z-10" />
             <div
+              ref={imageRef}
               className="bg-white overflow-hidden w-full max-w-[500px] lg:max-w-none"
               style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.06)', aspectRatio: '4/5' }}
             >
@@ -201,7 +306,7 @@ const Hero = memo(() => {
                 priority={true}
               />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 

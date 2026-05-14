@@ -3,6 +3,7 @@
 import React, { memo, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   FaReact, FaNodeJs, FaGitAlt, FaGithub, FaDatabase
 } from 'react-icons/fa';
@@ -11,6 +12,10 @@ import {
 } from 'react-icons/si';
 import { Zap, Globe, Shield } from 'lucide-react';
 import skillService from '../services/skillService';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const getImageUrl = (path) => {
   if (!path) return null;
@@ -102,19 +107,39 @@ const SkillCard = memo(({ skill, index, categoryColor }) => {
     }
   }, []);
 
+  // GSAP scroll reveal for skill card
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+
+    gsap.fromTo(el,
+      { opacity: 0, y: 40, scale: 0.95 },
+      {
+        opacity: 1, y: 0, scale: 1,
+        duration: 0.6, delay: index * 0.05, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
+      }
+    );
+
+    return () => {
+      ScrollTrigger.getAll().forEach((st) => {
+        if (st.trigger === el) st.kill();
+      });
+    };
+  }, [index]);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
-    >
+    <div>
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         className="skill-card group relative cursor-pointer"
-        style={{ transition: 'transform 0.2s ease-out' }}
+        style={{ transition: 'transform 0.2s ease-out', opacity: 0 }}
       >
         {/* Gradient glow border */}
         <div
@@ -150,7 +175,7 @@ const SkillCard = memo(({ skill, index, categoryColor }) => {
           </span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 SkillCard.displayName = 'SkillCard';
@@ -198,7 +223,59 @@ const FloatingParticles = memo(() => {
 });
 FloatingParticles.displayName = 'FloatingParticles';
 
-/* ─── Main Skills Section ─── */
+/* ─── Skills Header with GSAP ─── */
+const SkillsHeader = memo(() => {
+  const containerRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const titleRef = useRef(null);
+  const descRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      if (subtitleRef.current) {
+        gsap.fromTo(subtitleRef.current,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out',
+            scrollTrigger: { trigger: subtitleRef.current, start: 'top 88%', toggleActions: 'play none none none' } }
+        );
+      }
+      if (titleRef.current) {
+        gsap.fromTo(titleRef.current,
+          { opacity: 0, y: 40, clipPath: 'inset(0 0 100% 0)' },
+          { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 1, delay: 0.1, ease: 'power4.out',
+            scrollTrigger: { trigger: titleRef.current, start: 'top 88%', toggleActions: 'play none none none' } }
+        );
+      }
+      if (descRef.current) {
+        gsap.fromTo(descRef.current,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.7, delay: 0.25, ease: 'power3.out',
+            scrollTrigger: { trigger: descRef.current, start: 'top 88%', toggleActions: 'play none none none' } }
+        );
+      }
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="text-center mb-20">
+      <span ref={subtitleRef} className="inline-block text-xs font-bold uppercase tracking-[0.3em] text-primary/80 mb-4" style={{ opacity: 0 }}>
+        Expertise
+      </span>
+      <h2
+        ref={titleRef}
+        className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent"
+        style={{ backgroundImage: 'linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.5) 100%)', opacity: 0, willChange: 'clip-path, transform' }}
+      >
+        Technical Arsenal
+      </h2>
+      <p ref={descRef} className="text-white/40 text-lg max-w-[560px] mx-auto leading-relaxed" style={{ opacity: 0 }}>
+        Crafting high-performance digital experiences with a modern, battle-tested technology stack.
+      </p>
+    </div>
+  );
+});
+SkillsHeader.displayName = 'SkillsHeader';
 const Skills = memo(() => {
   const [skills, setSkills] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -261,34 +338,11 @@ const Skills = memo(() => {
       <FloatingParticles />
 
       <div className="mx-auto px-6 w-full relative z-10" style={{ maxWidth: '1320px' }}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-20"
-        >
-          <span className="inline-block text-xs font-bold uppercase tracking-[0.3em] text-primary/80 mb-4">
-            Expertise
-          </span>
-          <h2
-            className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent"
-            style={{ backgroundImage: 'linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.5) 100%)' }}
-          >
-            Technical Arsenal
-          </h2>
-          <p className="text-white/40 text-lg max-w-[560px] mx-auto leading-relaxed">
-            Crafting high-performance digital experiences with a modern, battle-tested technology stack.
-          </p>
-        </motion.div>
+        {/* Header — GSAP animated */}
+        <SkillsHeader />
 
         {/* Category Tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+        <div
           className="flex flex-wrap lg:justify-center gap-3 mb-16 overflow-x-auto no-scrollbar pb-4 -mx-6 px-6 lg:mx-0"
         >
           {categoryNames.map((cat) => (
@@ -304,7 +358,7 @@ const Skills = memo(() => {
               {CATEGORY_META[cat]?.label || cat}
             </button>
           ))}
-        </motion.div>
+        </div>
 
         {/* Skills Grid */}
         <div className="relative min-h-[300px]">
