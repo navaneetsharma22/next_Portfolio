@@ -173,6 +173,20 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        {/* Disable browser auto-scroll restoration to prevent jerk on refresh */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+              }
+              try {
+                var sp = sessionStorage.getItem('scrollPos');
+                if (sp) { window.scrollTo(0, parseInt(sp, 10)); }
+              } catch(e) {}
+            `,
+          }}
+        />
         <GoogleAnalytics />
         {children}
       </body>

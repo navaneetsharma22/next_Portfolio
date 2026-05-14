@@ -1,15 +1,20 @@
 "use client";
 
-import React, { memo, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Download, FileText, Code } from 'lucide-react';
+import React, { memo, useState, useEffect, useRef } from 'react';
+import { FileText } from 'lucide-react';
 import { FaInstagram, FaLinkedinIn, FaGithub, FaMediumM, FaDribbble } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { SiLeetcode } from 'react-icons/si';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LazyImage } from './ui/Shared';
 import ResumeModal from './ui/ResumeModal';
 import aboutService from '../services/aboutService';
 import { useCursor } from '../context/CursorContext';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
  * Custom Icon for Code 360 (Coding Ninjas)
@@ -39,17 +44,22 @@ const ICON_MAP = {
 };
 
 /**
- * About Component
- * Rebuilt to pin-point match the Picto reference:
- * - White card layout with constrained image size
- * - Overlapping social icons card with highlighted first icon
- * - Dual action buttons with icons
+ * About Component — ThoughtWorks-style GSAP ScrollTrigger animations
  */
 const About = memo(() => {
   const [aboutData, setAboutData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { setCursor } = useCursor();
+
+  // GSAP refs
+  const sectionRef = useRef(null);
+  const cardRef = useRef(null);
+  const imageRef = useRef(null);
+  const socialRef = useRef(null);
+  const titleRef = useRef(null);
+  const descRef = useRef(null);
+  const buttonsRef = useRef(null);
 
   const fetchAboutData = async () => {
     try {
@@ -65,6 +75,84 @@ const About = memo(() => {
   useEffect(() => {
     fetchAboutData();
   }, []);
+
+  // ── GSAP ScrollTrigger Animations ──
+  useEffect(() => {
+    if (isLoading) return;
+
+    const ctx = gsap.context(() => {
+      // Card — slide up from below
+      if (cardRef.current) {
+        gsap.fromTo(cardRef.current,
+          { opacity: 0, y: 80 },
+          {
+            opacity: 1, y: 0, duration: 1, ease: 'power3.out',
+            scrollTrigger: { trigger: cardRef.current, start: 'top 88%', toggleActions: 'play none none none' },
+          }
+        );
+      }
+
+      // Image — reveal with scale
+      if (imageRef.current) {
+        gsap.fromTo(imageRef.current,
+          { opacity: 0, scale: 1.1, clipPath: 'inset(100% 0 0 0)' },
+          {
+            opacity: 1, scale: 1, clipPath: 'inset(0% 0 0 0)',
+            duration: 1.2, delay: 0.2, ease: 'power4.out',
+            scrollTrigger: { trigger: imageRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+          }
+        );
+      }
+
+      // Social card — pop up
+      if (socialRef.current) {
+        gsap.fromTo(socialRef.current,
+          { opacity: 0, y: 30, scale: 0.9 },
+          {
+            opacity: 1, y: 0, scale: 1, duration: 0.7, delay: 0.6, ease: 'back.out(1.4)',
+            scrollTrigger: { trigger: socialRef.current, start: 'top 90%', toggleActions: 'play none none none' },
+          }
+        );
+      }
+
+      // Title — clip-path reveal
+      if (titleRef.current) {
+        gsap.fromTo(titleRef.current,
+          { opacity: 0, y: 40, clipPath: 'inset(0 0 100% 0)' },
+          {
+            opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)',
+            duration: 0.9, delay: 0.3, ease: 'power4.out',
+            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+          }
+        );
+      }
+
+      // Description — fade up
+      if (descRef.current) {
+        gsap.fromTo(descRef.current,
+          { opacity: 0, y: 25 },
+          {
+            opacity: 1, y: 0, duration: 0.7, delay: 0.5, ease: 'power3.out',
+            scrollTrigger: { trigger: descRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+          }
+        );
+      }
+
+      // Buttons — staggered
+      if (buttonsRef.current) {
+        const btns = buttonsRef.current.children;
+        gsap.fromTo(btns,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1, y: 0, duration: 0.5, stagger: 0.12, delay: 0.7, ease: 'power2.out',
+            scrollTrigger: { trigger: buttonsRef.current, start: 'top 90%', toggleActions: 'play none none none' },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [isLoading]);
 
   // Only hide if NOT loading AND explicitly hidden by admin
   if (!isLoading && aboutData?.isVisible === false) return null;
@@ -107,6 +195,7 @@ const About = memo(() => {
 
   return (
     <section
+      ref={sectionRef}
       id="about"
       className="pb-20 lg:pb-40 relative z-20 -mt-20 lg:-mt-40"
       aria-label="About section"
@@ -127,12 +216,10 @@ const About = memo(() => {
             </div>
           </div>
         ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+        <div
+          ref={cardRef}
           className="bg-white overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.08)] border border-white mx-2 sm:mx-0"
+          style={{ opacity: 0 }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
             
@@ -140,7 +227,7 @@ const About = memo(() => {
             <div className="lg:col-span-5 py-16 lg:py-28 px-8 lg:px-16 flex justify-center lg:justify-start">
               <div className="relative w-full max-w-[480px]">
                 {/* Profile Image */}
-                <div className="overflow-hidden">
+                <div ref={imageRef} className="overflow-hidden" style={{ opacity: 0 }}>
                   <LazyImage
                     src={aboutData?.profileImage || "/assets/navaneet.jpg"}
                     alt={aboutData?.title || "About Me"}
@@ -149,13 +236,11 @@ const About = memo(() => {
                   />
                 </div>
 
-                {/* Social Card — Fully Interactive Hover Effects */}
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3, duration: 0.6 }}
+                {/* Social Card */}
+                <div
+                  ref={socialRef}
                   className="absolute -bottom-6 lg:-bottom-8 left-1/2 lg:left-10 -translate-x-1/2 lg:translate-x-0 bg-white p-1.5 shadow-[0_15px_35px_rgba(0,0,0,0.1)] flex items-center gap-1 border border-border/5 w-max max-w-[90vw] overflow-x-auto no-scrollbar"
+                  style={{ opacity: 0 }}
                 >
                   {socialLinks.map((social, idx) => (
                     <a
@@ -171,18 +256,26 @@ const About = memo(() => {
                       <social.icon size={16} />
                     </a>
                   ))}
-                </motion.div>
+                </div>
               </div>
             </div>
 
             {/* Right Side — Content */}
             <div className="lg:col-span-7 py-20 lg:py-28 px-6 lg:px-16 lg:pl-4 text-center lg:text-left">
               <div className="max-w-[580px]">
-                <h2 className="text-3xl md:text-[44px] font-bold text-heading leading-[1.1] mb-8 tracking-tight">
+                <h2 
+                  ref={titleRef}
+                  className="text-3xl md:text-[44px] font-bold text-heading leading-[1.1] mb-8 tracking-tight"
+                  style={{ opacity: 0, willChange: 'clip-path, transform' }}
+                >
                   {aboutData?.title || "I am Professional User Experience Designer"}
                 </h2>
 
-                <div className="space-y-6 text-base md:text-lg text-body leading-relaxed mb-10 opacity-80">
+                <div 
+                  ref={descRef}
+                  className="space-y-6 text-base md:text-lg text-body leading-relaxed mb-10 opacity-80"
+                  style={{ opacity: 0 }}
+                >
                   <p>
                     {aboutData?.description || 
                       "I design and develop services for customers specializing creating stylish, modern websites, web services and online stores. My passion is to design digital user experiences."}
@@ -192,12 +285,13 @@ const About = memo(() => {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+                <div ref={buttonsRef} className="flex flex-wrap gap-4 justify-center lg:justify-start">
                   <button 
                     onClick={() => scrollToSection('projects')}
                     onMouseEnter={() => setCursor('hover')}
                     onMouseLeave={() => setCursor('default')}
                     className="btn-picto !rounded-none py-3.5 px-8"
+                    style={{ opacity: 0 }}
                   >
                     My Projects
                   </button>
@@ -207,6 +301,7 @@ const About = memo(() => {
                     onMouseEnter={() => setCursor('hover')}
                     onMouseLeave={() => setCursor('default')}
                     className="btn-picto-outline"
+                    style={{ opacity: 0 }}
                   >
                     <FileText size={20} />
                     View Resume
@@ -216,7 +311,7 @@ const About = memo(() => {
             </div>
 
           </div>
-        </motion.div>
+        </div>
         )}
       </div>
 

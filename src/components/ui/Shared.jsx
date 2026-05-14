@@ -1,12 +1,19 @@
 "use client";
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLazyImage } from '../../hooks';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /* ─────────────────────────────────────────────
    SHARED UI PRIMITIVES
    Consistent, accessible building blocks
+   Enhanced with ThoughtWorks-style GSAP ScrollTrigger
  ────────────────────────────────────────────── */
 
 /** Reusable section wrapper with standardized spacing */
@@ -23,33 +30,77 @@ export const Section = ({ id, children, className = '', bg = 'white', ...props }
   </section>
 );
 
-/** Reusable section header with subtitle + title */
-export const SectionHeader = ({ subtitle, title, description, align = 'left', className = '' }) => (
-  <div className={`${align === 'center' ? 'text-center' : ''} mb-14 ${className}`}>
-    {subtitle && (
-      <p
-        className="font-semibold text-sm uppercase tracking-widest mb-3"
-        style={{ color: 'var(--color-soft-dark)' }}
+/** Reusable section header with subtitle + title — GSAP clip-path reveal */
+export const SectionHeader = ({ subtitle, title, description, align = 'left', className = '' }) => {
+  const subtitleRef = useRef(null);
+  const titleRef = useRef(null);
+  const descRef = useRef(null);
+  const dividerRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const createAnim = (el, from, to, extraOpts = {}) => {
+        if (!el) return;
+        gsap.fromTo(el, from, {
+          ...to,
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+            onRefresh: (self) => { if (self.progress === 1) gsap.set(el, to); },
+          },
+          onComplete: () => { el.style.willChange = 'auto'; },
+          ...extraOpts,
+        });
+      };
+
+      // Subtitle — fade up
+      createAnim(subtitleRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' });
+      // Title — clip-path reveal
+      createAnim(titleRef.current, { opacity: 0, y: 35, clipPath: 'inset(0 0 100% 0)' }, { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.9, delay: 0.1, ease: 'power4.out' });
+      // Divider — width expand
+      createAnim(dividerRef.current, { scaleX: 0, transformOrigin: align === 'center' ? 'center' : 'left' }, { scaleX: 1, duration: 0.7, delay: 0.25, ease: 'power3.inOut' });
+      // Description — fade up
+      createAnim(descRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.3, ease: 'power3.out' });
+    });
+    return () => ctx.revert();
+  }, [align]);
+
+  return (
+    <div className={`${align === 'center' ? 'text-center' : ''} mb-14 ${className}`}>
+      {subtitle && (
+        <p
+          ref={subtitleRef}
+          className="font-semibold text-sm uppercase tracking-widest mb-3"
+          style={{ color: 'var(--color-soft-dark)' }}
+        >
+          {subtitle}
+        </p>
+      )}
+      <h2
+        ref={titleRef}
+        className="font-semibold mb-4"
+        style={{ fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--color-heading)', willChange: 'clip-path, transform' }}
       >
-        {subtitle}
-      </p>
-    )}
-    <h2
-      className="font-semibold mb-4"
-      style={{ fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--color-heading)' }}
-    >
-      {title}
-    </h2>
-    {description && (
-      <p
-        className={`text-base leading-relaxed ${align === 'center' ? 'mx-auto' : ''}`}
-        style={{ color: 'var(--color-body)', maxWidth: align === 'center' ? '480px' : 'none' }}
-      >
-        {description}
-      </p>
-    )}
-  </div>
-);
+        {title}
+      </h2>
+      <div
+        ref={dividerRef}
+        className={`w-12 h-[3px] bg-primary mb-4 ${align === 'center' ? 'mx-auto' : ''}`}
+      />
+      {description && (
+        <p
+          ref={descRef}
+          className={`text-base leading-relaxed ${align === 'center' ? 'mx-auto' : ''}`}
+          style={{ color: 'var(--color-body)', maxWidth: align === 'center' ? '480px' : 'none' }}
+        >
+          {description}
+        </p>
+      )}
+    </div>
+  );
+};
 
 /** Accessible, optimized lazy image with placeholder and blur effect */
 export const LazyImage = forwardRef(({ src, alt, className = '', style = {}, priority = false, ...props }, ref) => {
@@ -82,7 +133,7 @@ export const LazyImage = forwardRef(({ src, alt, className = '', style = {}, pri
             alt={alt}
             className={`w-full h-full object-cover ${className}`}
             loading="eager"
-            fetchpriority="high"
+            fetchPriority="high"
             {...props}
           />
         ) : (
@@ -108,28 +159,63 @@ export const LazyImage = forwardRef(({ src, alt, className = '', style = {}, pri
 
 LazyImage.displayName = 'LazyImage';
 
-/** Animated reveal wrapper — respects prefers-reduced-motion */
-export const AnimatedReveal = ({ children, direction = 'up', delay = 0, className = '' }) => {
-  const directionMap = {
-    up: { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } },
-    down: { initial: { opacity: 0, y: -30 }, animate: { opacity: 1, y: 0 } },
-    left: { initial: { opacity: 0, x: -40 }, animate: { opacity: 1, x: 0 } },
-    right: { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 } },
-    fade: { initial: { opacity: 0 }, animate: { opacity: 1 } },
-  };
+/** 
+ * Animated reveal wrapper — ThoughtWorks-style GSAP ScrollTrigger
+ * Now uses GSAP for more cinematic, precise scroll-triggered animations
+ * Handles scroll position restoration gracefully (no invisible elements)
+ */
+export const AnimatedReveal = ({ children, direction = 'up', delay = 0, className = '', stagger = false }) => {
+  const ref = useRef(null);
 
-  const { initial, animate } = directionMap[direction] || directionMap.up;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const directionConfig = {
+      up:    { from: { opacity: 0, y: 60 },  to: { opacity: 1, y: 0 } },
+      down:  { from: { opacity: 0, y: -60 }, to: { opacity: 1, y: 0 } },
+      left:  { from: { opacity: 0, x: -60 }, to: { opacity: 1, x: 0 } },
+      right: { from: { opacity: 0, x: 60 },  to: { opacity: 1, x: 0 } },
+      fade:  { from: { opacity: 0 },          to: { opacity: 1 } },
+      scale: { from: { opacity: 0, scale: 0.9 }, to: { opacity: 1, scale: 1 } },
+      clipUp: { from: { opacity: 0, y: 40, clipPath: 'inset(0 0 100% 0)' }, to: { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' } },
+    };
+
+    const config = directionConfig[direction] || directionConfig.up;
+
+    const anim = gsap.fromTo(el, config.from, {
+      ...config.to,
+      duration: 0.9,
+      delay,
+      ease: 'power3.out',
+      immediateRender: false,
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 88%',
+        toggleActions: 'play none none none',
+        // If element is already past trigger point (e.g. after refresh), play immediately
+        onRefresh: (self) => {
+          if (self.progress === 1) {
+            gsap.set(el, config.to);
+          }
+        },
+      },
+      onComplete: () => {
+        // Free GPU memory after animation
+        el.style.willChange = 'auto';
+      },
+    });
+
+    return () => {
+      anim.scrollTrigger?.kill();
+      anim.kill();
+    };
+  }, [direction, delay]);
 
   return (
-    <motion.div
-      initial={initial}
-      whileInView={animate}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-      className={className}
-    >
+    <div ref={ref} className={className} style={{ willChange: 'transform, opacity' }}>
       {children}
-    </motion.div>
+    </div>
   );
 };
 
