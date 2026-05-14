@@ -4,7 +4,7 @@ import React, { memo, useState, useEffect, useRef } from 'react';
 import { FileText } from 'lucide-react';
 import { FaInstagram, FaLinkedinIn, FaGithub, FaMediumM, FaDribbble } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
-import { SiLeetcode } from 'react-icons/si';
+import { SiLeetcode, SiGeeksforgeeks } from 'react-icons/si';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LazyImage } from './ui/Shared';
@@ -41,6 +41,7 @@ const ICON_MAP = {
   dribbble: FaDribbble,
   code360: Code360Icon,
   leetcode: SiLeetcode,
+  geeksforgeeks: SiGeeksforgeeks,
 };
 
 /**
@@ -161,10 +162,11 @@ const About = memo(() => {
     { platform: 'linkedin', icon: FaLinkedinIn, isPrimary: true },
     { platform: 'github', icon: FaGithub },
     { platform: 'twitter', icon: FaXTwitter, fallback: 'https://x.com/NavaneetSh79884' },
-    { platform: 'leetcode', icon: SiLeetcode, fallback: 'https://leetcode.com/u/NavaneetSharma/' },
     { platform: 'code360', icon: Code360Icon, fallback: 'https://www.naukri.com/code360/profile/Navaneet' },
+    { platform: 'geeksforgeeks', icon: SiGeeksforgeeks, fallback: 'https://www.geeksforgeeks.org/user/navaneetsharma/' },
     { platform: 'medium', icon: FaMediumM, fallback: 'https://medium.com/@navaneetsharma26' },
     { platform: 'dribbble', icon: FaDribbble, fallback: 'https://dribbble.com/navaneet-sharma' },
+    { platform: 'leetcode', icon: SiLeetcode, fallback: 'https://leetcode.com/u/NavaneetSharma/' },
   ].map(social => {
     const dynamicLink = aboutData?.socialLinks?.find(l => l.platform.toLowerCase() === social.platform);
     return {
@@ -268,7 +270,7 @@ const About = memo(() => {
                   className="text-3xl md:text-[44px] font-bold text-heading leading-[1.1] mb-8 tracking-tight"
                   style={{ opacity: 0, willChange: 'clip-path, transform' }}
                 >
-                  {aboutData?.title || "I am Professional User Experience Designer"}
+                  {aboutData?.title || "Transforming Ideas into Seamless Digital Realities"}
                 </h2>
 
                 <div 
@@ -278,10 +280,10 @@ const About = memo(() => {
                 >
                   <p>
                     {aboutData?.description || 
-                      "I design and develop services for customers specializing creating stylish, modern websites, web services and online stores. My passion is to design digital user experiences."}
+                      "I am a Full Stack MERN Developer specializing in high-performance web applications, cinematic UI designs, and scalable full-stack solutions. With a focus on modern technologies like Next.js, React, and Node.js, I bridge the gap between complex backend logic and pixel-perfect frontend experiences."}
                   </p>
                   <p>
-                    I design and develop services for customers specializing creating stylish, modern websites, web services.
+                    {aboutData?.description2 || "Passionate about creating stylish, modern websites and digital user experiences that leave a lasting impression."}
                   </p>
                 </div>
 
