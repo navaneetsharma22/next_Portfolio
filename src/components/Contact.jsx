@@ -4,9 +4,26 @@ import React, { useState, memo, useEffect, useMemo } from 'react';
 import { MapPin, Mail, Phone, Send } from 'lucide-react';
 import { FaFacebookF, FaGithub, FaInstagram, FaLinkedinIn, FaMediumM, FaDribbble, FaQuestion } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
+import { SiLeetcode, SiGeeksforgeeks } from 'react-icons/si';
 import { AnimatedReveal } from './ui/Shared';
 import contactService from '../services/contactService';
 import { toast } from 'react-hot-toast';
+
+/**
+ * Custom Icon for Code 360 (Coding Ninjas)
+ */
+const Code360Icon = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path 
+      d="M18 8.5C17.2 7.4 15.8 6.8 14.2 6.8C10.8 6.8 8.5 9.4 8.5 13C8.5 16.6 10.8 19.2 14.2 19.2C15.8 19.2 17.2 18.6 18 17.5" 
+      stroke="currentColor" 
+      strokeWidth="2.5" 
+      strokeLinecap="round"
+    />
+    <path d="M12.5 12.5L14.5 13L12.5 13.5V12.5Z" fill="currentColor"/>
+    <path d="M17.5 12.5L15.5 13L17.5 13.5V12.5Z" fill="currentColor"/>
+  </svg>
+);
 
 const ICON_MAP = {
   'linkedin': FaLinkedinIn,
@@ -16,7 +33,10 @@ const ICON_MAP = {
   'instagram': FaInstagram,
   'facebook': FaFacebookF,
   'medium': FaMediumM,
-  'dribbble': FaDribbble
+  'dribbble': FaDribbble,
+  'leetcode': SiLeetcode,
+  'geeksforgeeks': SiGeeksforgeeks,
+  'code360': Code360Icon
 };
 
 const Contact = memo(() => {
@@ -46,14 +66,32 @@ const Contact = memo(() => {
   ], [info]);
 
   const socialLinks = useMemo(() => {
+    const defaults = [
+      { platform: 'linkedin', Icon: FaLinkedinIn, url: 'https://linkedin.com/in/navaneet-sharma-750b50357/' },
+      { platform: 'github', Icon: FaGithub, url: 'https://github.com/navaneetsharma22' },
+      { platform: 'x', Icon: FaXTwitter, url: 'https://x.com/NavaneetSh79884' },
+      { platform: 'code360', Icon: Code360Icon, url: 'https://www.naukri.com/code360/profile/Navaneet' },
+      { platform: 'medium', Icon: FaMediumM, url: 'https://medium.com/@navaneetsharma26' },
+      { platform: 'dribbble', Icon: FaDribbble, url: 'https://dribbble.com/navaneet-sharma' },
+      { platform: 'leetcode', Icon: SiLeetcode, url: 'https://leetcode.com/u/NavaneetSharma/' },
+    ];
+
     if (!info?.socialLinks || info.socialLinks.length === 0) {
-      return [];
+      return defaults;
     }
-    return info.socialLinks.map(link => ({
+
+    // Merge or prioritize info.socialLinks
+    const dynamicLinks = info.socialLinks.map(link => ({
+      platform: link.platform.toLowerCase(),
       Icon: ICON_MAP[link.platform.toLowerCase()] || FaQuestion,
-      label: link.platform,
       url: link.url
     }));
+
+    // For simplicity, let's just use the defaults and override if dynamic exists
+    return defaults.map(def => {
+      const dynamic = dynamicLinks.find(d => d.platform === def.platform);
+      return dynamic || def;
+    });
   }, [info]);
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -139,10 +177,10 @@ const Contact = memo(() => {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-soft-dark hover:text-primary transition-all duration-300 transform hover:scale-125"
-                      title={social.label}
+                      className="text-soft-dark hover:text-[#9929fb] transition-all duration-300 transform hover:scale-125 flex items-center justify-center w-10 h-10 rounded-full hover:bg-purple-50"
+                      title={social.platform}
                     >
-                      <social.Icon size={18} />
+                      <social.Icon size={20} />
                     </a>
                   ))}
                 </div>
