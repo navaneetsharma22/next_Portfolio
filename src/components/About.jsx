@@ -4,7 +4,7 @@ import React, { memo, useState, useEffect, useRef } from 'react';
 import { FileText } from 'lucide-react';
 import { FaInstagram, FaLinkedinIn, FaGithub, FaMediumM, FaDribbble } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
-import { SiLeetcode, SiGeeksforgeeks } from 'react-icons/si';
+import { SiLeetcode } from 'react-icons/si';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LazyImage } from './ui/Shared';
@@ -41,7 +41,6 @@ const ICON_MAP = {
   dribbble: FaDribbble,
   code360: Code360Icon,
   leetcode: SiLeetcode,
-  geeksforgeeks: SiGeeksforgeeks,
 };
 
 /**
@@ -163,7 +162,6 @@ const About = memo(() => {
     { platform: 'github', icon: FaGithub },
     { platform: 'twitter', icon: FaXTwitter, fallback: 'https://x.com/NavaneetSh79884' },
     { platform: 'code360', icon: Code360Icon, fallback: 'https://www.naukri.com/code360/profile/Navaneet' },
-    { platform: 'geeksforgeeks', icon: SiGeeksforgeeks, fallback: 'https://www.geeksforgeeks.org/user/navaneetsharma/' },
     { platform: 'medium', icon: FaMediumM, fallback: 'https://medium.com/@navaneetsharma26' },
     { platform: 'dribbble', icon: FaDribbble, fallback: 'https://dribbble.com/navaneet-sharma' },
     { platform: 'leetcode', icon: SiLeetcode, fallback: 'https://leetcode.com/u/NavaneetSharma/' },

@@ -4,7 +4,7 @@ import React, { useState, memo, useEffect, useMemo } from 'react';
 import { MapPin, Mail, Phone, Send } from 'lucide-react';
 import { FaFacebookF, FaGithub, FaInstagram, FaLinkedinIn, FaMediumM, FaDribbble, FaQuestion } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
-import { SiLeetcode, SiGeeksforgeeks } from 'react-icons/si';
+import { SiLeetcode } from 'react-icons/si';
 import { AnimatedReveal } from './ui/Shared';
 import contactService from '../services/contactService';
 import { toast } from 'react-hot-toast';
@@ -35,7 +35,6 @@ const ICON_MAP = {
   'medium': FaMediumM,
   'dribbble': FaDribbble,
   'leetcode': SiLeetcode,
-  'geeksforgeeks': SiGeeksforgeeks,
   'code360': Code360Icon
 };
 
