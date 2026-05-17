@@ -148,7 +148,7 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Preconnect for fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -172,7 +172,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(navigationSchema) }}
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {/* Disable browser auto-scroll restoration to prevent jerk on refresh */}
         <script
           dangerouslySetInnerHTML={{
