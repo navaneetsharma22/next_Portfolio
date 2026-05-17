@@ -30,6 +30,7 @@ const Preloader = ({ onComplete }) => {
   useEffect(() => {
     let animationFrame;
     let currentIncrement = 0.2;
+    let lastTime = performance.now();
     
     // Check for window load
     const handleLoad = () => { isReadyRef.current = true; };
@@ -39,15 +40,19 @@ const Preloader = ({ onComplete }) => {
       window.addEventListener('load', handleLoad);
     }
 
-    const update = () => {
+    const update = (currentTime) => {
+      // Calculate delta time to ensure smooth progress regardless of refresh rate (60hz vs 144hz)
+      const deltaTime = currentTime - lastTime;
+      lastTime = currentTime;
+      const timeScale = isNaN(deltaTime) ? 1 : Math.min(deltaTime / 16.66, 2);
+
       // Determine target speed based on readiness
-      // If ready, we want to finish faster but still smoothly
-      const targetIncrement = isReadyRef.current ? 1.8 : 0.3;
+      const targetIncrement = isReadyRef.current ? 1.5 : 0.25;
       
       // Smoothly interpolate the increment (momentum)
-      currentIncrement += (targetIncrement - currentIncrement) * 0.05;
+      currentIncrement += (targetIncrement - currentIncrement) * 0.05 * timeScale;
       
-      progressRef.current = Math.min(progressRef.current + currentIncrement, 100);
+      progressRef.current = Math.min(progressRef.current + (currentIncrement * timeScale), 100);
       smoothProgress.set(progressRef.current);
 
       // Update tasks based on progress with a slight delay/smoothness
@@ -63,7 +68,7 @@ const Preloader = ({ onComplete }) => {
         // Final completion with a slight ease-out pause
         setTimeout(() => {
           onComplete();
-        }, 600);
+        }, 500);
       }
     };
 
@@ -80,11 +85,12 @@ const Preloader = ({ onComplete }) => {
       initial={{ opacity: 1 }}
       exit={{ 
         opacity: 0,
-        y: -100,
-        filter: "blur(20px)",
-        transition: { duration: 1, ease: [0.76, 0, 0.24, 1] }
+        y: -50,
+        // Removed heavy blur for better performance on exit
+        transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
       }}
       className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center overflow-hidden"
+      style={{ willChange: "transform, opacity" }}
     >
       {/* Dynamic Background Mesh */}
       <div className="absolute inset-0 opacity-40">
@@ -94,6 +100,7 @@ const Preloader = ({ onComplete }) => {
             rotate: [0, 5, 0],
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          style={{ willChange: "transform" }}
           className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-[radial-gradient(circle_at_30%_30%,rgba(153,41,251,0.08)_0%,transparent_50%),radial-gradient(circle_at_70%_70%,rgba(79,70,229,0.05)_0%,transparent_50%)]"
         />
       </div>
@@ -124,11 +131,12 @@ const Preloader = ({ onComplete }) => {
             style={{
               background: 'linear-gradient(135deg, #9929fb, #4f46e5)',
               boxShadow: '0 20px 50px rgba(153, 41, 251, 0.2)',
-              borderRadius: "40% 60% 70% 30% / 40% 40% 60% 50%" // Set base style too
+              borderRadius: "40% 60% 70% 30% / 40% 40% 60% 50%", // Set base style too
+              willChange: "transform, border-radius"
             }}
           >
             {/* Glossy Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none" />
             
             <motion.span
               style={{ opacity: useTransform(smoothProgress, [0, 80, 100], [0, 0, 1]) }}
@@ -142,6 +150,7 @@ const Preloader = ({ onComplete }) => {
           <motion.div 
             animate={{ rotate: 360 }}
             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            style={{ willChange: "transform" }}
             className="absolute -inset-4 border border-primary/10 rounded-full"
           />
         </div>
@@ -154,7 +163,9 @@ const Preloader = ({ onComplete }) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 0.5, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
               className="text-[10px] font-bold uppercase tracking-[0.6em] text-black mb-10 h-4"
+              style={{ willChange: "transform, opacity" }}
             >
               {tasks[taskIndex]}
             </motion.p>
@@ -163,7 +174,7 @@ const Preloader = ({ onComplete }) => {
           {/* Minimal Loading Bar */}
           <div className="w-64 h-[2px] bg-black/5 relative overflow-hidden">
             <motion.div 
-              style={{ scaleX: useTransform(smoothProgress, [0, 100], [0, 1]), originX: 0 }}
+              style={{ scaleX: useTransform(smoothProgress, [0, 100], [0, 1]), originX: 0, willChange: "transform" }}
               className="absolute inset-0 bg-primary"
             />
           </div>
@@ -179,3 +190,4 @@ const Preloader = ({ onComplete }) => {
 };
 
 export default Preloader;
+

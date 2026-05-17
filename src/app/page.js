@@ -1,5 +1,7 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { CursorProvider } from '@/context/CursorContext';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -15,10 +17,29 @@ import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import SmoothScroll from '@/components/SmoothScroll';
 import MouseFollower from '@/components/ui/MouseFollower';
+import Preloader from '@/components/ui/Preloader';
 
 export default function HomePage() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user has already seen the preloader in this session
+    const hasSeenPreloader = sessionStorage.getItem('preloader_seen');
+    if (hasSeenPreloader) {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handlePreloaderComplete = () => {
+    setIsLoading(false);
+    sessionStorage.setItem('preloader_seen', 'true');
+  };
+
   return (
     <CursorProvider>
+      <AnimatePresence mode="wait">
+        {isLoading && <Preloader onComplete={handlePreloaderComplete} />}
+      </AnimatePresence>
       <SmoothScroll>
         <MouseFollower />
         <div className="bg-background">
