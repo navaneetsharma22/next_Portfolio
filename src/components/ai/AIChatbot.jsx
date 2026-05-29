@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Command, ChevronDown, MessageCircle, Briefcase, Loader2, CheckCircle2, FileText, Copy, CheckCheck, Wand2, Flame, RotateCcw, Languages, Calculator, BrainCircuit } from 'lucide-react';
+import { X, Send, Command, ChevronDown, MessageCircle, Briefcase, Loader2, CheckCircle2, FileText, Copy, CheckCheck, Wand2, Flame, RotateCcw, Languages, Calculator, BrainCircuit, Sparkles } from 'lucide-react';
 
 const SUGGESTED_QUESTIONS = [
   "What tech stack does Navaneet know?",
