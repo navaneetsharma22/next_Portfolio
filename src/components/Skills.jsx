@@ -276,12 +276,13 @@ const SkillsHeader = memo(() => {
   );
 });
 SkillsHeader.displayName = 'SkillsHeader';
-const Skills = memo(() => {
-  const [skills, setSkills] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const Skills = memo(({ initialData }) => {
+  const [skills, setSkills] = useState(initialData || []);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [activeCategory, setActiveCategory] = useState('All');
 
   useEffect(() => {
+    if (initialData) return;
     const fetchSkills = async () => {
       try {
         const data = await skillService.getAll();
@@ -294,7 +295,7 @@ const Skills = memo(() => {
       }
     };
     fetchSkills();
-  }, []);
+  }, [initialData]);
 
   const categoryNames = useMemo(() => {
     const cats = [...new Set(skills.map(s => s.category || 'Other'))];

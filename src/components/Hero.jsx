@@ -56,9 +56,9 @@ const TypingAnimation = ({ phrases }) => {
   );
 };
 
-const Hero = memo(() => {
-  const [heroData, setHeroData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+const Hero = memo(({ initialData }) => {
+  const [heroData, setHeroData] = useState(initialData || null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { setCursor } = useCursor();
 
@@ -84,8 +84,9 @@ const Hero = memo(() => {
   };
 
   useEffect(() => {
+    if (initialData) return;
     fetchHeroData();
-  }, []);
+  }, [initialData]);
 
   // ── GSAP Entrance Animations (ThoughtWorks-style) ──
   useEffect(() => {

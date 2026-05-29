@@ -46,9 +46,9 @@ const ICON_MAP = {
 /**
  * About Component — ThoughtWorks-style GSAP ScrollTrigger animations
  */
-const About = memo(() => {
-  const [aboutData, setAboutData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+const About = memo(({ initialData }) => {
+  const [aboutData, setAboutData] = useState(initialData || null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { setCursor } = useCursor();
 
@@ -73,8 +73,9 @@ const About = memo(() => {
   };
 
   useEffect(() => {
+    if (initialData) return;
     fetchAboutData();
-  }, []);
+  }, [initialData]);
 
   // ── GSAP ScrollTrigger Animations ──
   useEffect(() => {

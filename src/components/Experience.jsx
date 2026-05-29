@@ -11,14 +11,15 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const Experience = () => {
-  const [experiences, setExperiences] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Experience = ({ initialData }) => {
+  const [experiences, setExperiences] = useState(initialData || []);
+  const [loading, setLoading] = useState(!initialData);
   const timelineRef = useRef(null);
   const cardsContainerRef = useRef(null);
   const lineRef = useRef(null);
 
   useEffect(() => {
+    if (initialData) return;
     const fetchExperiences = async () => {
       try {
         const res = await experienceService.getExperiences();
@@ -35,7 +36,7 @@ const Experience = () => {
       }
     };
     fetchExperiences();
-  }, []);
+  }, [initialData]);
 
   // ── GSAP ScrollTrigger Animations ──
   useEffect(() => {
