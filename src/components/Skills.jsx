@@ -183,9 +183,19 @@ SkillCard.displayName = 'SkillCard';
 /* ─── Floating Particles (GSAP) ─── */
 const FloatingParticles = memo(() => {
   const ref = useRef(null);
+  const [particles, setParticles] = useState([]);
 
   useEffect(() => {
-    if (!ref.current) return;
+    // Generate random positions on client side only to avoid SSR hydration mismatch
+    const generated = Array.from({ length: 18 }).map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    }));
+    setParticles(generated);
+  }, []);
+
+  useEffect(() => {
+    if (!ref.current || particles.length === 0) return;
     const dots = ref.current.children;
     gsap.utils.toArray(dots).forEach((dot, i) => {
       gsap.to(dot, {
@@ -201,18 +211,18 @@ const FloatingParticles = memo(() => {
         repeat: -1, yoyo: true, ease: 'sine.inOut',
       });
     });
-  }, []);
+  }, [particles]);
 
   const colors = ['#9929fb', '#06b6d4', '#22c55e', '#f59e0b'];
   return (
     <div ref={ref} className="absolute inset-0 pointer-events-none overflow-hidden">
-      {Array.from({ length: 18 }).map((_, i) => (
+      {particles.map((p, i) => (
         <div
           key={i}
           className="absolute w-1 h-1 rounded-full"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: p.left,
+            top: p.top,
             backgroundColor: colors[i % colors.length],
             opacity: 0.3,
           }}
@@ -276,12 +286,13 @@ const SkillsHeader = memo(() => {
   );
 });
 SkillsHeader.displayName = 'SkillsHeader';
-const Skills = memo(() => {
-  const [skills, setSkills] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const Skills = memo(({ initialData }) => {
+  const [skills, setSkills] = useState(initialData || []);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [activeCategory, setActiveCategory] = useState('All');
 
   useEffect(() => {
+    if (initialData) return;
     const fetchSkills = async () => {
       try {
         const data = await skillService.getAll();
@@ -294,7 +305,7 @@ const Skills = memo(() => {
       }
     };
     fetchSkills();
-  }, []);
+  }, [initialData]);
 
   const categoryNames = useMemo(() => {
     const cats = [...new Set(skills.map(s => s.category || 'Other'))];

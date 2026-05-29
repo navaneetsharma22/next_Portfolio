@@ -15,9 +15,9 @@ if (typeof window !== 'undefined') {
 
 const categories = ['All', 'MERN Stack', 'React Apps', 'Dashboards', 'SaaS', 'Backend APIs', 'Full Stack'];
 
-const ProjectSection = memo(() => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+const ProjectSection = memo(({ initialData }) => {
+  const [projects, setProjects] = useState(initialData || []);
+  const [loading, setLoading] = useState(!initialData);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProject, setSelectedProject] = useState(null);
@@ -50,11 +50,14 @@ const ProjectSection = memo(() => {
   }, [activeCategory, searchTerm]);
 
   useEffect(() => {
+    // If we have initial data and haven't typed a search/changed category yet, skip fetch
+    if (initialData && activeCategory === 'All' && searchTerm === '') return;
+    
     const timer = setTimeout(() => {
       fetchProjects();
     }, 400);
     return () => clearTimeout(timer);
-  }, [fetchProjects]);
+  }, [fetchProjects, initialData, activeCategory, searchTerm]);
 
   // ── GSAP ScrollTrigger Animations (ThoughtWorks-style) ──
   useEffect(() => {

@@ -1,21 +1,52 @@
 import { siteConfig } from '@/config/site';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
 /**
- * Dynamic sitemap generator — automatically includes all project pages
- * from the backend database. No manual updates needed.
- *
- * This is one of the biggest SEO advantages over a Vite SPA.
+ * Dynamic sitemap generator.
+ * Includes static anchor sections and dynamic project routes.
+ * All sections are listed with anchor URLs for Google to index.
  */
 export default async function sitemap() {
-  // ─── Static routes ────────────────────────────────────────
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+  const API_URL = `${BACKEND_URL}/api`;
+  const now = new Date();
+
+  // ─── Static section routes ─────────────────────────────────
   const staticRoutes = [
     {
       url: siteConfig.url,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 1.0,
+    },
+    {
+      url: `${siteConfig.url}/#about`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${siteConfig.url}/#projects`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${siteConfig.url}/#experience`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${siteConfig.url}/#skills`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${siteConfig.url}/#contact`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.7,
     },
   ];
 
@@ -23,18 +54,22 @@ export default async function sitemap() {
   let projectRoutes = [];
   try {
     const res = await fetch(`${API_URL}/projects`, {
-      next: { revalidate: 3600 }, // Re-fetch every hour
+      next: { revalidate: 3600 },
     });
     if (res.ok) {
       const data = await res.json();
       const projects = data.data || data.projects || data || [];
-      
-      projectRoutes = projects.map((project) => ({
-        url: `${siteConfig.url}/project/${project.slug}`,
-        lastModified: new Date(project.updatedAt || project.createdAt || Date.now()),
-        changeFrequency: 'monthly',
-        priority: 0.7,
-      }));
+
+      projectRoutes = Array.isArray(projects)
+        ? projects
+            .filter((p) => p.slug)
+            .map((project) => ({
+              url: `${siteConfig.url}/project/${project.slug}`,
+              lastModified: new Date(project.updatedAt || project.createdAt || Date.now()),
+              changeFrequency: 'monthly',
+              priority: 0.75,
+            }))
+        : [];
     }
   } catch (error) {
     console.error('Failed to fetch projects for sitemap:', error);

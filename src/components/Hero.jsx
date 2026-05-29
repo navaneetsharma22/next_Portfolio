@@ -56,9 +56,9 @@ const TypingAnimation = ({ phrases }) => {
   );
 };
 
-const Hero = memo(() => {
-  const [heroData, setHeroData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+const Hero = memo(({ initialData }) => {
+  const [heroData, setHeroData] = useState(initialData || null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { setCursor } = useCursor();
 
@@ -84,8 +84,9 @@ const Hero = memo(() => {
   };
 
   useEffect(() => {
+    if (initialData) return;
     fetchHeroData();
-  }, []);
+  }, [initialData]);
 
   // ── GSAP Entrance Animations (ThoughtWorks-style) ──
   useEffect(() => {
@@ -201,7 +202,9 @@ const Hero = memo(() => {
           #ffffff
         `,
       }}
-      aria-label="Hero section"
+      aria-label="Navaneet Sharma — MERN Stack Developer Portfolio"
+      itemScope
+      itemType="https://schema.org/Person"
     >
       <div
         className="mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center w-full relative z-10"
@@ -233,13 +236,19 @@ const Hero = memo(() => {
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-body">Available for Projects</span>
               </div>
 
+              {/* Hidden SEO text — read by Google, invisible to users */}
+              <span className="sr-only">
+                Navaneet Sharma (navaneetsharma22) — MERN Stack Developer and Full Stack Web Developer from India.
+                GitHub: github.com/navaneetsharma22 | LinkedIn: linkedin.com/in/navaneet-sharma-750b50357
+              </span>
+
               <h1 
                 ref={headingRef}
                 className="font-bold leading-[1.1] mb-6 tracking-tighter text-heading text-4xl sm:text-5xl lg:text-7xl"
                 style={{ opacity: 0, willChange: 'clip-path, transform' }}
               >
-                Hello, I'm <br />
-                {heroData?.title || 'Navaneet Sharma'}
+                Hello, I&apos;m <br />
+                <span itemProp="name">{heroData?.title || 'Navaneet Sharma'}</span>
               </h1>
 
               <div 

@@ -37,11 +37,14 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         // Fetch all required data in parallel
-        const [statsData, projectsData, messagesData] = await Promise.all([
+        const [statsData, projectsRaw, messagesRaw] = await Promise.all([
           adminService.getDashboardStats(),
           projectService.getAll(),
-          contactService.getAll()
+          contactService.getAll().catch(() => [])
         ]);
+        // getAll() returns { projects: [], total, pages } — extract the array
+        const projectsData = Array.isArray(projectsRaw) ? projectsRaw : (projectsRaw?.projects ?? []);
+        const messagesData = Array.isArray(messagesRaw) ? messagesRaw : [];
         
         setStats(statsData);
 

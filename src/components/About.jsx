@@ -46,9 +46,9 @@ const ICON_MAP = {
 /**
  * About Component — ThoughtWorks-style GSAP ScrollTrigger animations
  */
-const About = memo(() => {
-  const [aboutData, setAboutData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+const About = memo(({ initialData }) => {
+  const [aboutData, setAboutData] = useState(initialData || null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { setCursor } = useCursor();
 
@@ -73,8 +73,9 @@ const About = memo(() => {
   };
 
   useEffect(() => {
+    if (initialData) return;
     fetchAboutData();
-  }, []);
+  }, [initialData]);
 
   // ── GSAP ScrollTrigger Animations ──
   useEffect(() => {
@@ -158,8 +159,8 @@ const About = memo(() => {
   if (!isLoading && aboutData?.isVisible === false) return null;
 
   const socialLinks = [
-    { platform: 'linkedin', icon: FaLinkedinIn, isPrimary: true },
-    { platform: 'github', icon: FaGithub },
+    { platform: 'linkedin', icon: FaLinkedinIn, isPrimary: true, fallback: 'https://www.linkedin.com/in/navaneet-sharma-750b50357/' },
+    { platform: 'github', icon: FaGithub, fallback: 'https://github.com/navaneet-sharma' },
     { platform: 'twitter', icon: FaXTwitter, fallback: 'https://x.com/NavaneetSh79884' },
     { platform: 'code360', icon: Code360Icon, fallback: 'https://www.naukri.com/code360/profile/Navaneet' },
     { platform: 'medium', icon: FaMediumM, fallback: 'https://medium.com/@navaneetsharma26' },
