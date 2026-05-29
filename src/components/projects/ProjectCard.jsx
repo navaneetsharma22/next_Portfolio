@@ -6,6 +6,7 @@ import { FaGithub } from 'react-icons/fa';
 import { ArrowUpRight } from 'lucide-react';
 import { LazyImage } from '../ui/Shared';
 import { useCursor } from '../../context/CursorContext';
+import ExplainToggle from '../ai/ExplainToggle';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -278,6 +279,8 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
             </button>
           </div>
         </div>
+
+        <ExplainToggle project={project} />
       </div>
     </article>
   );

@@ -18,6 +18,10 @@ import ScrollToTop from '@/components/ScrollToTop';
 import SmoothScroll from '@/components/SmoothScroll';
 import MouseFollower from '@/components/ui/MouseFollower';
 import Preloader from '@/components/ui/Preloader';
+import AIChatbot from '@/components/ai/AIChatbot';
+import RecruiterMatchmaker from '@/components/ai/RecruiterMatchmaker';
+import CoverLetterGenerator from '@/components/ai/CoverLetterGenerator';
+import RoastMyStack from '@/components/ai/RoastMyStack';
 
 export default function ClientHome({ initialData }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -53,10 +57,14 @@ export default function ClientHome({ initialData }) {
             <Services />
             <Process />
             <CTA />
+            <RecruiterMatchmaker />
+            <CoverLetterGenerator />
+            <RoastMyStack />
             <Contact />
           </main>
           <Footer />
           <ScrollToTop />
+          <AIChatbot />
         </div>
       </SmoothScroll>
     </CursorProvider>
