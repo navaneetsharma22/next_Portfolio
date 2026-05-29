@@ -27,8 +27,8 @@ const SmoothScroll = ({ children }) => {
     // Respect prefers-reduced-motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     
-    // Disable on mobile for native scroll performance
-    const isMobile = window.innerWidth < 768;
+    // Disable on mobile/tablet for native scroll performance
+    const isMobile = window.innerWidth < 1024;
 
     if (prefersReducedMotion || isMobile) {
       // Still refresh ScrollTrigger for GSAP animations without Lenis
@@ -37,12 +37,14 @@ const SmoothScroll = ({ children }) => {
     }
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.8,
+      easing: (t) => 1 - Math.pow(1 - t, 3), // cubic ease-out — snappy, no jerk
       direction: 'vertical',
       gestureDirection: 'vertical',
       smoothWheel: true,
-      touchMultiplier: 2,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5,
+      infinite: false,
     });
 
     lenisRef.current = lenis;
