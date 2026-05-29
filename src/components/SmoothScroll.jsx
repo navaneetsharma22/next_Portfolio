@@ -58,24 +58,33 @@ const SmoothScroll = ({ children }) => {
     });
     gsap.ticker.lagSmoothing(0); // Prevent GSAP from compensating for lag
 
-    // ── Restore scroll position on refresh ──
-    const savedPosition = sessionStorage.getItem('scrollPos');
+    // ── Robust Scroll Restoration on Refresh ──
+    const scrollKey = `scrollPos-${pathname}`;
+    const savedPosition = sessionStorage.getItem(scrollKey);
+    
     if (savedPosition) {
       const pos = parseInt(savedPosition, 10);
-      // Wait for page layout to stabilize before restoring
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+      let retries = 0;
+      
+      const tryRestore = () => {
+        // Wait until document is tall enough OR max retries reached (e.g., 2 seconds)
+        if (document.documentElement.scrollHeight >= pos + window.innerHeight / 2 || retries > 20) {
           window.scrollTo(0, pos);
           lenis.scrollTo(pos, { immediate: true });
-          // Refresh ScrollTrigger after position restore
           setTimeout(() => ScrollTrigger.refresh(), 100);
-        });
-      });
+          sessionStorage.removeItem(scrollKey); // Clear it so it doesn't apply on soft navigations
+        } else {
+          retries++;
+          setTimeout(tryRestore, 100);
+        }
+      };
+      
+      requestAnimationFrame(tryRestore);
     }
 
-    // ── Save scroll position before unload ──
+    // Save scroll position only on actual browser refresh/unload
     const saveScrollPosition = () => {
-      sessionStorage.setItem('scrollPos', String(window.scrollY));
+      sessionStorage.setItem(scrollKey, String(window.scrollY));
     };
     window.addEventListener('beforeunload', saveScrollPosition);
 
