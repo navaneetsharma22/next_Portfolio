@@ -160,7 +160,7 @@ const About = memo(({ initialData }) => {
 
   const socialLinks = [
     { platform: 'linkedin', icon: FaLinkedinIn, isPrimary: true, fallback: 'https://www.linkedin.com/in/navaneet-sharma-750b50357/' },
-    { platform: 'github', icon: FaGithub, fallback: 'https://github.com/navaneet-sharma' },
+    { platform: 'github', icon: FaGithub, fallback: 'https://github.com/navaneetsharma22' },
     { platform: 'twitter', icon: FaXTwitter, fallback: 'https://x.com/NavaneetSh79884' },
     { platform: 'code360', icon: Code360Icon, fallback: 'https://www.naukri.com/code360/profile/Navaneet' },
     { platform: 'medium', icon: FaMediumM, fallback: 'https://medium.com/@navaneetsharma26' },
