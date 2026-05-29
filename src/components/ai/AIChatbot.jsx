@@ -83,6 +83,18 @@ export default function AIChatbot({ initialData }) {
     }
   }, [messages, isOpen, activeTab]);
 
+  // Lock background scrolling by pausing Lenis (prevents layout shift jerk)
+  useEffect(() => {
+    if (isOpen) {
+      if (window.lenis) window.lenis.stop();
+    } else {
+      if (window.lenis) window.lenis.start();
+    }
+    return () => {
+      if (window.lenis) window.lenis.start();
+    };
+  }, [isOpen]);
+
   // Handle generic AI call
   const callAI = async (feature, payload, setLoading, setResult, setError) => {
     setLoading(true);
