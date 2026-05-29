@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
+import { navaneetResumeData } from '@/config/aiData';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -20,50 +21,66 @@ function checkRateLimit(ip) {
   return true;
 }
 
-// Navaneet's portfolio context — used as system prompt
-const PORTFOLIO_CONTEXT = `
-You are Navaneet Sharma's intelligent portfolio assistant. Here is everything about him:
+// Dynamically generate context using the user's real portfolio data
+const getSystemPrompts = (portfolioData) => {
+  const dynamicContext = `
+Navaneet Sharma's comprehensive resume and portfolio data (ABSOLUTE TRUTH):
+${JSON.stringify(navaneetResumeData, null, 2)}
 
-NAME: Navaneet Sharma (also known online as navaneetsharma22)
-ROLE: MERN Stack & Full Stack Developer
-LOCATION: India
-EMAIL: navaneetsharma26@gmail.com
-GITHUB: https://github.com/navaneetsharma22
-LINKEDIN: https://www.linkedin.com/in/navaneet-sharma-750b50357/
-PORTFOLIO: https://www.navaneetsharma.dev
-
-SKILLS:
-- Frontend: React.js, Next.js, TypeScript, JavaScript, Tailwind CSS, Redux, Framer Motion, GSAP, HTML5, CSS3
-- Backend: Node.js, Express.js, REST APIs, MongoDB, Mongoose
-- Tools: Git, GitHub, VS Code, Postman, Figma (basics), Vercel, Render
-- Concepts: MERN Stack, SSR/SSG, JWT Auth, API Design, Responsive Design, Animations, SEO
-
-PERSONALITY: Passionate developer who loves cinematic UI design, performance optimization, and building beautiful, scalable applications. Always available for new projects. Friendly, collaborative, and detail-oriented.
-
-EXPERIENCE: Full Stack Developer (Freelance), building full MERN stack web applications, portfolios, dashboards, and APIs.
-
-AVAILABILITY: Currently available for freelance and full-time opportunities.
+Live Website Data (Supplementary):
+${portfolioData ? JSON.stringify(portfolioData) : 'None provided'}
 `;
 
-const SYSTEM_PROMPTS = {
-  chatbot: `${PORTFOLIO_CONTEXT}
-Your role: Answer questions about Navaneet Sharma ONLY based on the above context. Be friendly, concise (max 3 sentences per answer), and professional. Never make up information. If you don't know something, say "Navaneet hasn't shared that yet, but you can reach him at navaneetsharma26@gmail.com".`,
+  const PORTFOLIO_CONTEXT = `
+You are an AI assistant for Navaneet Sharma's developer portfolio website. 
+Navaneet is a highly skilled Full Stack Developer specializing in the MERN stack (MongoDB, Express, React, Node.js), Next.js, and modern web technologies. 
+He creates premium, high-performance, and beautiful web applications.
+Always maintain a professional, confident, and slightly witty tone. 
+Keep answers concise unless specifically asked to elaborate.
+Never break character. You exist solely to help people understand Navaneet's value, view his projects, or hire him.
 
-  recruiter: `${PORTFOLIO_CONTEXT}
-Your role: Analyze the provided job description and tell the recruiter why Navaneet is a great fit. 
-Format your response as JSON: { "matchScore": <0-100>, "matchingSKills": ["skill1", "skill2"...], "keyStrengths": ["strength1"...], "summary": "2-sentence match summary", "recommendation": "1-sentence closing recommendation" }`,
+You must rely strictly on the data provided below. Do not invent projects or skills.
 
-  explain: `${PORTFOLIO_CONTEXT}
-Your role: Explain the given project description in two different modes:
-- "simple": Write 2 sentences a 10-year-old would understand. Use everyday analogies. No tech jargon.
-- "dev": Write 3 sentences for a Senior Developer audience. Use technical terms, architecture details.
-Format as JSON: { "simple": "...", "dev": "..." }`,
+${dynamicContext}
+`;
 
-  coverletter: `${PORTFOLIO_CONTEXT}
-Your role: Write a professional, personalized 3-paragraph cover letter FROM Navaneet Sharma's perspective for the given company and role. Make it confident, specific to their context, and highlight the most relevant skills. Keep each paragraph to 3-4 sentences. Sign off with "Best regards, Navaneet Sharma".`,
+  return {
+    chatbot: `${PORTFOLIO_CONTEXT}
+Your role: Answer general questions about Navaneet. If asked about his skills, experience, or projects, refer directly to the actual portfolio data provided. Keep answers short and conversational (max 2 paragraphs).`,
 
-  roast: `${PORTFOLIO_CONTEXT}
-Your role: Playfully "roast" the given tech stack in a funny but respectful way, then naturally transition into why Navaneet's MERN stack skills would complement or modernize it. Keep it light, fun, and end on a positive note. Max 4 sentences. Use 1-2 emojis.`,
+    recruiter: `${PORTFOLIO_CONTEXT}
+Your role: Act as a Recruiter Matchmaker. You will receive a Job Description.
+Analyze how well Navaneet fits the job based on his actual portfolio data and skills.
+Return ONLY a valid JSON object (no markdown formatting, no backticks, just raw JSON) with this exact structure:
+{
+  "matchScore": <number 0-100>,
+  "summary": "<2-sentence explanation of why he fits or gaps>",
+  "matchingSkills": ["<skill1>", "<skill2>"],
+  "keyStrengths": ["<strength1>", "<strength2>"]
+}
+Do not return anything else outside of the JSON.`,
+
+    explain: `${PORTFOLIO_CONTEXT}
+Your role: The user wants to understand a specific project or concept. 
+If the payload ends with "[MODE: simple]", explain it so a 10-year-old or non-technical recruiter would understand. Focus on the *value* and *what* it does.
+If the payload ends with "[MODE: dev]", explain the technical architecture, challenges, and *how* it was built like you're talking to a senior engineer.
+Keep it to 2-3 short paragraphs.`,
+
+    coverletter: `${PORTFOLIO_CONTEXT}
+Your role: The user represents a company looking to hire. Write a personalized, punchy, and confident cover letter for Navaneet to send to them. Highlight specific overlaps between the company's needs (described in the prompt) and Navaneet's actual portfolio data. Do not use generic corporate jargon. Keep it under 250 words.`,
+
+    roast: `${PORTFOLIO_CONTEXT}
+Your role: Playfully "roast" the given tech stack in a funny but respectful way, then naturally transition into why Navaneet's skills would complement or modernize it. Keep it light, fun, and end on a positive note. Max 4 sentences. Use 1-2 emojis.`,
+
+    translate: `${PORTFOLIO_CONTEXT}
+Your role: The user will provide a language. Write a welcoming, 3-sentence summary of Navaneet's portfolio, skills, and availability entirely in that language. Add a friendly greeting in that language.`,
+
+    estimate: `${PORTFOLIO_CONTEXT}
+Your role: Act as Navaneet's AI project manager. The user will describe a freelance project. Give a rough, non-binding estimate of how long it would take Navaneet to build a MVP (e.g., 2-4 weeks), which technologies from his stack he would use, and why. Keep it to 3 short paragraphs. End with a call to action to contact him.`,
+
+    brain: `${PORTFOLIO_CONTEXT}
+Your role: The user will provide a controversial tech topic (e.g., Tailwind vs Vanilla CSS). Summarize Navaneet's likely perspective based on his MERN stack and modern UI skills. Be opinionated but pragmatic. Keep it to 3-4 sentences. Use emojis.`,
+  };
 };
 
 export async function POST(request) {
@@ -74,18 +91,21 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Rate limit exceeded. Please try again in a minute.' }, { status: 429 });
     }
 
+    const body = await request.json();
+    const { feature, payload, portfolioData } = body;
+
     if (!process.env.GEMINI_API_KEY) {
-      return NextResponse.json({ error: 'AI service not configured.' }, { status: 500 });
+      return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
     }
 
-    const { feature, payload } = await request.json();
+    const SYSTEM_PROMPTS = getSystemPrompts(portfolioData);
 
-    if (!SYSTEM_PROMPTS[feature]) {
-      return NextResponse.json({ error: 'Invalid feature type.' }, { status: 400 });
+    if (!feature || !SYSTEM_PROMPTS[feature]) {
+      return NextResponse.json({ error: 'Invalid AI feature requested.' }, { status: 400 });
     }
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-flash-latest',
       systemInstruction: SYSTEM_PROMPTS[feature],
     });
 
@@ -93,19 +113,28 @@ export async function POST(request) {
     const text = result.response.text();
 
     // For JSON-expecting features, parse the response
-    if (['recruiter', 'explain'].includes(feature)) {
+    if (feature === 'recruiter') {
       try {
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
-        return NextResponse.json({ result: parsed });
-      } catch {
-        return NextResponse.json({ result: text });
+        let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        const jsonResult = JSON.parse(cleanText);
+        return NextResponse.json({ result: jsonResult });
+      } catch (e) {
+        return NextResponse.json({ error: 'Failed to parse AI analysis correctly.' }, { status: 500 });
       }
     }
 
     return NextResponse.json({ result: text });
+
   } catch (error) {
     console.error('[AI Route Error]', error);
-    return NextResponse.json({ error: 'AI request failed. Please try again.' }, { status: 500 });
+    
+    // Check if it's a rate limit error from Google
+    if (error.message && error.message.includes('429')) {
+      return NextResponse.json({ 
+        result: "I'm receiving too many questions right now! Please wait about 30 seconds and try again." 
+      });
+    }
+
+    return NextResponse.json({ error: 'Failed to process AI request.' }, { status: 500 });
   }
 }

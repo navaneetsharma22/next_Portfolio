@@ -53,9 +53,12 @@ const SmoothScroll = ({ children }) => {
     lenis.on('scroll', ScrollTrigger.update);
 
     // Use GSAP ticker for Lenis instead of rAF (smoother + synced)
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
+    // Store the RAF wrapper so we can remove the exact same function on cleanup
+    const rafCallback = (time) => lenis.raf(time * 1000);
+    // save to ref so cleanup can access it
+    lenisRef.current = lenisRef.current || {};
+    lenisRef.current.rafCallback = rafCallback;
+    gsap.ticker.add(rafCallback);
     gsap.ticker.lagSmoothing(0); // Prevent GSAP from compensating for lag
 
     // ── Robust Scroll Restoration on Refresh ──
@@ -97,9 +100,24 @@ const SmoothScroll = ({ children }) => {
     return () => {
       window.removeEventListener('beforeunload', saveScrollPosition);
       window.removeEventListener('load', handleLoad);
-      lenis.off('scroll', ScrollTrigger.update);
-      gsap.ticker.remove(lenis.raf);
-      lenis.destroy();
+      try {
+        lenis.off('scroll', ScrollTrigger.update);
+        // remove the exact raf callback we added
+        if (lenisRef.current && lenisRef.current.rafCallback) {
+          gsap.ticker.remove(lenisRef.current.rafCallback);
+        } else {
+          gsap.ticker.remove(lenis.raf);
+        }
+      } catch (e) {
+        // ignore
+      }
+      try {
+        lenis.destroy();
+      } catch (e) {
+        // ignore
+      }
+      // clear global reference
+      if (window.lenis === lenis) window.lenis = null;
       lenisRef.current = null;
     };
   }, [pathname]);
