@@ -47,10 +47,10 @@ const Preloader = ({ onComplete }) => {
       const timeScale = isNaN(deltaTime) ? 1 : Math.min(deltaTime / 16.66, 2);
 
       // Determine target speed based on readiness
-      const targetIncrement = isReadyRef.current ? 1.5 : 0.25;
+      const targetIncrement = isReadyRef.current ? 4.0 : 0.8;
       
       // Smoothly interpolate the increment (momentum)
-      currentIncrement += (targetIncrement - currentIncrement) * 0.05 * timeScale;
+      currentIncrement += (targetIncrement - currentIncrement) * 0.1 * timeScale;
       
       progressRef.current = Math.min(progressRef.current + (currentIncrement * timeScale), 100);
       smoothProgress.set(progressRef.current);
@@ -65,10 +65,10 @@ const Preloader = ({ onComplete }) => {
       if (progressRef.current < 100) {
         animationFrame = requestAnimationFrame(update);
       } else {
-        // Final completion with a slight ease-out pause
+        // Final completion with a shorter ease-out pause
         setTimeout(() => {
           onComplete();
-        }, 500);
+        }, 200);
       }
     };
 

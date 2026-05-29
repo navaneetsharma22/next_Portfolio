@@ -78,6 +78,9 @@ const Navbar = memo(() => {
 
   return (
     <nav
+      // Suppress hydration warnings for injected/extension attributes
+      // (keeps the app usable while we diagnose extension-driven mismatches)
+      suppressHydrationWarning
       className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${
         scrolled 
           ? 'bg-white/95 backdrop-blur-md py-3 lg:py-4 shadow-lg shadow-black/5' 

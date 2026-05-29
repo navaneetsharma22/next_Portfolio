@@ -18,6 +18,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import SmoothScroll from '@/components/SmoothScroll';
 import MouseFollower from '@/components/ui/MouseFollower';
 import Preloader from '@/components/ui/Preloader';
+import AIChatbot from '@/components/ai/AIChatbot';
 
 export default function ClientHome({ initialData }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -57,6 +58,7 @@ export default function ClientHome({ initialData }) {
           </main>
           <Footer />
           <ScrollToTop />
+          <AIChatbot initialData={initialData} />
         </div>
       </SmoothScroll>
     </CursorProvider>

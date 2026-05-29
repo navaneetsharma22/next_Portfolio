@@ -272,7 +272,8 @@ const ProjectSection = memo(({ initialData }) => {
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-100 p-4 pl-12 text-sm text-[#1a1a1a] placeholder:text-gray-300 focus:outline-none focus:border-primary/30 transition-all duration-300"
+              className="w-full bg-gray-50 border border-gray-100 p-4 pl-12 text-sm text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+              suppressHydrationWarning
             />
           </div>
         </div>
