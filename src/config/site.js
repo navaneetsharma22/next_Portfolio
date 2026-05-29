@@ -1,7 +1,6 @@
 /**
  * Centralized Site Configuration
  * Single source of truth for all SEO, branding, and social metadata.
- * Inspired by sleek-portfolio's siteConfig pattern.
  */
 
 const BASE_URL = "https://www.navaneetsharma.dev";
@@ -9,30 +8,26 @@ const BASE_URL = "https://www.navaneetsharma.dev";
 export const siteConfig = {
   // ─── Identity ──────────────────────────────────────────────
   name: "Navaneet Sharma",
-  title: "Navaneet Sharma | MERN Stack Developer | Full Stack Developer | Portfolio",
+  shortName: "NavaneetSharma",
+  username: "navaneetsharma22",
+  title: "Navaneet Sharma — MERN Stack & Full Stack Developer | Portfolio",
   description:
-    "Navaneet Sharma is a MERN Stack Developer specializing in high-performance web applications, cinematic UI designs, and scalable full-stack solutions. Based in India. Explore projects, experience, and resume.",
+    "Navaneet Sharma (navaneetsharma22) is a Full Stack MERN Developer from India specializing in React.js, Next.js, Node.js, and MongoDB. Explore projects, experience, resume, and get in touch.",
   url: BASE_URL,
   themeColor: "#9929fb",
 
   // ─── Open Graph Images ────────────────────────────────────
   ogImage: `${BASE_URL}/assets/navaneet.jpg`,
-  ogImages: {
-    home: `${BASE_URL}/og-home.png`,
-    projects: `${BASE_URL}/og-projects.png`,
-    experience: `${BASE_URL}/og-experience.png`,
-    skills: `${BASE_URL}/og-skills.png`,
-    contact: `${BASE_URL}/og-contact.png`,
-  },
 
-  // ─── Social Links ─────────────────────────────────────────
+  // ─── Social Links — must EXACTLY match your profile URLs ──
   links: {
-    github: "https://github.com/navaneetsharma22",
-    linkedin: "https://linkedin.com/in/navaneet-sharma-750b50357/",
-    twitter: "https://x.com/NavaneetSh79884",
+    github:   "https://github.com/navaneetsharma22",
+    linkedin: "https://www.linkedin.com/in/navaneet-sharma-750b50357/",
+    twitter:  "https://x.com/NavaneetSh79884",
     leetcode: "https://leetcode.com/u/NavaneetSharma/",
-    medium: "https://medium.com/@navaneetsharma26",
+    medium:   "https://medium.com/@navaneetsharma26",
     dribbble: "https://dribbble.com/navaneet-sharma",
+    code360:  "https://www.naukri.com/code360/profile/Navaneet",
   },
 
   // ─── Twitter Handle ───────────────────────────────────────
@@ -43,63 +38,56 @@ export const siteConfig = {
   creator: "Navaneet Sharma",
 
   // ─── Keywords ─────────────────────────────────────────────
-  // Organized by category for maximum SEO coverage
   keywords: [
-    // Name variations
+    // Exact-match name searches (highest priority)
     "Navaneet Sharma",
-    "Navaneet",
-    "navaneet developer",
+    "navaneetsharma22",
     "navaneet sharma developer",
-    "navaneet web developer",
-    "navaneet full stack",
+    "navaneet sharma mern developer",
+    "navaneet sharma full stack developer",
+    "navaneet sharma react developer",
+    "navaneet sharma next.js developer",
+    "navaneet sharma software engineer",
+    "navaneet sharma github",
+    "navaneet sharma linkedin",
+    "navaneet sharma portfolio",
+    "navaneet sharma india",
+    "navaneet sharma web developer",
+    "navaneet sharma portfolio website",
+    "navaneet sharma resume",
+    "navaneet sharma projects",
+    "navaneet sharma hire",
+    "navaneet sharma contact",
+    "navaneet sharma official",
+    "navaneet developer",
+    "navaneet mern stack",
     "navaneet react js",
     "navaneet next js",
-    "navaneet mern",
-    "navaneet software engineer",
+    "navaneet node js",
+    "navaneet coder",
     "navaneet frontend",
     "navaneet backend",
-    "navaneet coder",
-    "portfolio navaneet",
-    "navaneet tech portfolio",
+    "navaneet portfolio",
     "hire navaneet",
-    "Navaneet Sharma Portfolio",
-    "Navaneet Sharma personal website",
-    "Navaneet Sharma developer portfolio",
-    "navaneet sharma portfolio website",
-    "navaneet developer portfolio",
-    "portfolio navaneet sharma",
-    "navaneet sharma official site",
-    "navaneet sharma official website",
-    "navaneet sharma online portfolio",
     "hire navaneet sharma",
-    "navaneet sharma contact",
-    "navaneet sharma mern",
-    "navaneet sharma react js",
-    "Navaneet Sharma Resume",
-    "Navaneet Sharma Developer",
-    "Navaneet Sharma Software Engineer",
-    "Navaneet Sharma Full Stack",
-    "Navaneet Sharma GitHub",
-    "Navaneet Sharma LinkedIn",
 
-    // Role keywords
+    // Role + skill searches
+    "MERN Stack Developer",
     "Full Stack Developer",
     "Full Stack Web Developer",
     "Frontend Developer",
     "Backend Developer",
-    "MERN Stack Developer",
-    "Software Developer",
-    "Software Engineer",
-    "Web Developer",
     "React Developer",
     "Next.js Developer",
     "Node.js Developer",
     "JavaScript Developer",
-    "TypeScript Developer",
     "MongoDB Developer",
     "Express.js Developer",
-    "UI Designer",
-    "UX Developer",
+    "Software Developer",
+    "Software Engineer",
+    "Web Developer",
+    "UI Developer",
+    "API Developer",
 
     // Tech stack
     "React.js",
@@ -107,46 +95,40 @@ export const siteConfig = {
     "Node.js",
     "MongoDB",
     "Express.js",
-    "TypeScript",
     "JavaScript",
+    "TypeScript",
     "Tailwind CSS",
     "Redux",
     "GSAP",
     "Framer Motion",
     "REST API",
     "MERN Stack",
-    "Vite",
-    "Full Stack Development",
 
     // Location-based
     "Developer India",
     "Web Developer India",
-    "Software Developer India",
     "Full Stack Developer India",
-    "Software Engineer India",
-    "Freelance Developer India",
     "MERN Stack Developer India",
+    "Freelance Developer India",
+    "Software Engineer India",
 
-    // Hiring / intent-based
+    // Hiring intent
     "hire full stack developer",
-    "hire react developer",
-    "hire MERN developer India",
+    "hire react developer india",
+    "hire mern developer",
     "developer portfolio website",
-    "software developer portfolio",
-    "best full stack developer portfolio",
-    "freelance web developer",
+    "best portfolio 2025",
     "creative developer portfolio",
-    "modern web developer portfolio",
-    "cinematic UI developer",
+    "cinematic portfolio",
   ],
 
   // ─── Navigation (for JSON-LD SiteNavigationElement) ───────
   navigation: [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/#about" },
-    { name: "Projects", path: "/#projects" },
+    { name: "Home",       path: "/"            },
+    { name: "About",      path: "/#about"      },
+    { name: "Projects",   path: "/#projects"   },
     { name: "Experience", path: "/#experience" },
-    { name: "Skills", path: "/#skills" },
-    { name: "Contact", path: "/#contact" },
+    { name: "Skills",     path: "/#skills"     },
+    { name: "Contact",    path: "/#contact"    },
   ],
 };

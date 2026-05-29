@@ -4,6 +4,8 @@ import React, { memo, useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import heroService from '../services/heroService';
+import { FaGithub, FaLinkedinIn } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -49,7 +51,7 @@ const Footer = memo(() => {
   }, [heroData]);
 
   const footerLinks = ['Home', 'About', 'Projects', 'Experience', 'Skills', 'Contact'];
-  const fullName = heroData?.title || 'Navaneet sharma';
+  const fullName = heroData?.title || 'Navaneet Sharma';
   const brandName = fullName;
 
   return (
@@ -93,23 +95,61 @@ const Footer = memo(() => {
           {/* Copyright - Right */}
           <div className="flex justify-center lg:justify-end lg:w-1/4">
             <p className="text-[15px] font-medium text-white/60">
-              Copyright © {currentYear} {brandName}.
+              Copyright &copy; {currentYear} {brandName}.
             </p>
           </div>
         </div>
 
+        {/* Social profile links with rel="me" — Google uses this to verify identity */}
+        <div className="flex justify-center gap-6 mb-6">
+          <a
+            href="https://github.com/navaneetsharma22"
+            rel="me noopener noreferrer"
+            target="_blank"
+            aria-label="Navaneet Sharma on GitHub (navaneetsharma22)"
+            className="w-10 h-10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all duration-300 rounded-full"
+          >
+            <FaGithub size={18} />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/navaneet-sharma-750b50357/"
+            rel="me noopener noreferrer"
+            target="_blank"
+            aria-label="Navaneet Sharma on LinkedIn"
+            className="w-10 h-10 flex items-center justify-center text-white/50 hover:text-[#0A66C2] hover:bg-white/10 transition-all duration-300 rounded-full"
+          >
+            <FaLinkedinIn size={18} />
+          </a>
+          <a
+            href="https://x.com/NavaneetSh79884"
+            rel="me noopener noreferrer"
+            target="_blank"
+            aria-label="Navaneet Sharma on X (Twitter)"
+            className="w-10 h-10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all duration-300 rounded-full"
+          >
+            <FaXTwitter size={18} />
+          </a>
+        </div>
+
         {/* Credit Section */}
         <div className="mt-4 text-center text-sm font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          Developed with <span className="text-red-500" aria-label="love">♥</span> by{' '}
-          <a href="#" className="text-white font-bold hover:underline">{fullName}</a>
+          Developed with <span className="text-red-500" aria-label="love">&#9829;</span> by{' '}
+          <a
+            href="https://github.com/navaneetsharma22"
+            rel="me noopener noreferrer"
+            target="_blank"
+            className="text-white font-bold hover:underline"
+          >
+            {fullName}
+          </a>
         </div>
       </div>
 
       {/* Decorative Background Text */}
-      <div 
+      <div
         className="absolute bottom-4 left-6 leading-none select-none pointer-events-none z-[-1] font-black tracking-[0.5em] opacity-5"
-        style={{ 
-          fontSize: 'min(5vw, 70px)', 
+        style={{
+          fontSize: 'min(5vw, 70px)',
           WebkitTextStroke: '0.5px rgba(255, 255, 255, 0.6)',
           color: 'transparent'
         }}

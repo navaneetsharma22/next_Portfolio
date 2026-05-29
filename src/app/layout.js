@@ -35,18 +35,21 @@ export const metadata = {
 
   // ─── Open Graph ─────────────────────────────────────────
   openGraph: {
-    type: 'website',
+    type: 'profile',
     locale: 'en_US',
     url: siteConfig.url,
     title: siteConfig.title,
     description: siteConfig.description,
-    siteName: `${siteConfig.name} Portfolio`,
+    siteName: `${siteConfig.name} — Portfolio`,
+    firstName: 'Navaneet',
+    lastName: 'Sharma',
+    username: siteConfig.username,
     images: [
       {
         url: siteConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: `${siteConfig.name} — MERN Stack Developer`,
+        alt: `Navaneet Sharma — MERN Stack & Full Stack Developer`,
       },
     ],
   },
@@ -74,49 +77,64 @@ export const metadata = {
   // ─── Other Meta ─────────────────────────────────────────
   other: {
     'theme-color': siteConfig.themeColor,
-    'apple-mobile-web-app-capable': 'yes',
+    'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': siteConfig.name,
   },
 };
 
 export default function RootLayout({ children }) {
-  // ─── JSON-LD: Person Schema ───────────────────────────────
+
+  // ─── JSON-LD: Person Schema (Google Knowledge Panel) ─────
+  // sameAs with exact LinkedIn + GitHub URLs is how Google links
+  // your site to your social profiles in search results.
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     '@id': `${siteConfig.url}/#person`,
-    name: siteConfig.name,
+    name: 'Navaneet Sharma',
+    givenName: 'Navaneet',
+    familyName: 'Sharma',
     alternateName: [
       'navaneetsharma22',
-      'Navaneet Sharma',
-      'navaneet developer',
-      'navaneet sharma developer',
+      'Navaneet Sharma Developer',
+      'navaneet sharma mern developer',
+      'navaneet full stack developer',
     ],
     url: siteConfig.url,
-    image: `${siteConfig.url}/assets/navaneet.jpg`,
-    sameAs: Object.values(siteConfig.links),
-    jobTitle: [
-      'MERN Stack Developer',
-      'Full Stack Developer',
-      'Frontend Developer',
-      'Backend Developer',
-      'Software Engineer',
-      'Web Developer',
+    image: {
+      '@type': 'ImageObject',
+      url: `${siteConfig.url}/assets/navaneet.jpg`,
+      width: 800,
+      height: 1000,
+      caption: 'Navaneet Sharma — MERN Stack Developer',
+    },
+    // sameAs tells Google that navaneetsharma22 on GitHub == this website's person
+    sameAs: [
+      'https://github.com/navaneetsharma22',
+      'https://www.linkedin.com/in/navaneet-sharma-750b50357/',
+      'https://x.com/NavaneetSh79884',
+      'https://leetcode.com/u/NavaneetSharma/',
+      'https://medium.com/@navaneetsharma26',
+      'https://www.naukri.com/code360/profile/Navaneet',
+      siteConfig.url,
     ],
+    jobTitle: 'MERN Stack Developer',
     description: siteConfig.description,
     knowsAbout: [
       'React.js', 'Next.js', 'Node.js', 'Express.js', 'MongoDB',
       'JavaScript', 'TypeScript', 'Tailwind CSS', 'Redux', 'GSAP',
       'Framer Motion', 'REST API', 'MERN Stack', 'Full Stack Development',
-      'UI/UX Design', 'Web Development',
+      'Web Development', 'UI/UX Design',
     ],
     hasOccupation: {
       '@type': 'Occupation',
       name: 'MERN Stack Developer',
-      skills: 'React, Next.js, Node.js, Express.js, MongoDB, TypeScript, JavaScript, Tailwind CSS, Redux, GSAP, Framer Motion',
+      occupationLocation: { '@type': 'Country', name: 'India' },
+      skills: 'React.js, Next.js, Node.js, Express.js, MongoDB, JavaScript, TypeScript, Tailwind CSS, GSAP, Framer Motion, REST API',
     },
     knowsLanguage: ['en', 'hi'],
+    nationality: { '@type': 'Country', name: 'India' },
     worksFor: { '@type': 'Organization', name: 'Freelance' },
     address: { '@type': 'PostalAddress', addressCountry: 'IN' },
   };
@@ -126,25 +144,55 @@ export default function RootLayout({ children }) {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${siteConfig.url}/#website`,
-    name: `${siteConfig.name} — Portfolio`,
+    name: 'Navaneet Sharma — Portfolio',
     alternateName: [
-      'navaneet sharma portfolio',
-      'navaneet developer portfolio',
+      'navaneetsharma22 portfolio',
+      'navaneet sharma developer portfolio',
       'navaneetsharma.dev',
     ],
     url: siteConfig.url,
     description: siteConfig.description,
+    author: { '@id': `${siteConfig.url}/#person` },
     publisher: { '@id': `${siteConfig.url}/#person` },
+    inLanguage: 'en-US',
+    // Sitelinks search box hint for Google
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteConfig.url}/?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  // ─── JSON-LD: ProfilePage Schema ─────────────────────────
+  // This directly signals to Google that this is a developer profile page
+  const profilePageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    '@id': `${siteConfig.url}/#profilepage`,
+    name: 'Navaneet Sharma — Developer Portfolio',
+    url: siteConfig.url,
+    description: siteConfig.description,
+    mainEntity: { '@id': `${siteConfig.url}/#person` },
+    about: { '@id': `${siteConfig.url}/#person` },
+    dateCreated: '2024-01-01',
+    dateModified: new Date().toISOString(),
     inLanguage: 'en-US',
   };
 
-  // ─── JSON-LD: SiteNavigationElement ───────────────────────
-  const navigationSchema = {
+  // ─── JSON-LD: BreadcrumbList ───────────────────────────────
+  const breadcrumbSchema = {
     '@context': 'https://schema.org',
-    '@type': 'SiteNavigationElement',
-    '@id': `${siteConfig.url}/#site-navigation`,
-    name: siteConfig.navigation.map(item => item.name),
-    url: siteConfig.navigation.map(item => `${siteConfig.url}${item.path}`),
+    '@type': 'BreadcrumbList',
+    '@id': `${siteConfig.url}/#breadcrumb`,
+    itemListElement: siteConfig.navigation.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      item: `${siteConfig.url}${item.path}`,
+    })),
   };
 
   return (
@@ -158,7 +206,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
 
-        {/* JSON-LD Structured Data */}
+        {/* JSON-LD Structured Data — 4 schemas for maximum Google coverage */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
@@ -169,7 +217,11 @@ export default function RootLayout({ children }) {
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(navigationSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
       </head>
       <body suppressHydrationWarning>
