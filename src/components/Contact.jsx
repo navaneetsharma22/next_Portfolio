@@ -7,6 +7,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { SiLeetcode } from 'react-icons/si';
 import { AnimatedReveal } from './ui/Shared';
 import contactService from '../services/contactService';
+import aboutService from '../services/aboutService';
 import { toast } from 'react-hot-toast';
 
 /**
@@ -38,17 +39,24 @@ const ICON_MAP = {
   'code360': Code360Icon
 };
 
-const Contact = memo(() => {
-  const [info, setInfo] = useState(null);
+const Contact = memo(({ initialData }) => {
+  const [info, setInfo] = useState(initialData?.contact || null);
+  const [aboutData, setAboutData] = useState(initialData?.about || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialData?.contact);
   const [form, setForm] = useState({ name: '', email: '', location: '', phone: '', budget: '', subject: '', message: '' });
 
   useEffect(() => {
+    if (initialData?.contact && initialData?.about) return;
+    
     const fetchInfo = async () => {
       try {
-        const data = await contactService.getInfo();
-        setInfo(data);
+        const [contactRes, aboutRes] = await Promise.all([
+          contactService.getInfo().catch(() => null),
+          aboutService.getAboutData().catch(() => null)
+        ]);
+        setInfo(contactRes);
+        setAboutData(aboutRes);
       } catch (err) {
         console.error('Failed to fetch contact info');
       } finally {
@@ -56,7 +64,7 @@ const Contact = memo(() => {
       }
     };
     fetchInfo();
-  }, []);
+  }, [initialData]);
 
   const contactDetails = useMemo(() => [
     { Icon: MapPin, label: 'Address:', value: info?.address || '' },
@@ -65,33 +73,17 @@ const Contact = memo(() => {
   ], [info]);
 
   const socialLinks = useMemo(() => {
-    const defaults = [
-      { platform: 'linkedin', Icon: FaLinkedinIn, url: 'https://linkedin.com/in/navaneet-sharma-750b50357/' },
-      { platform: 'github', Icon: FaGithub, url: 'https://github.com/navaneetsharma22' },
-      { platform: 'x', Icon: FaXTwitter, url: 'https://x.com/NavaneetSh79884' },
-      { platform: 'code360', Icon: Code360Icon, url: 'https://www.naukri.com/code360/profile/Navaneet' },
-      { platform: 'medium', Icon: FaMediumM, url: 'https://medium.com/@navaneetsharma26' },
-      { platform: 'dribbble', Icon: FaDribbble, url: 'https://dribbble.com/navaneet-sharma' },
-      { platform: 'leetcode', Icon: SiLeetcode, url: 'https://leetcode.com/u/NavaneetSharma/' },
-    ];
-
-    if (!info?.socialLinks || info.socialLinks.length === 0) {
-      return defaults;
-    }
-
-    // Merge or prioritize info.socialLinks
-    const dynamicLinks = info.socialLinks.map(link => ({
+    // DB social links from About Section (primary source of truth)
+    const source = (aboutData?.socialLinks?.length > 0 && aboutData.socialLinks) || [];
+    
+    return source.map(link => ({
       platform: link.platform.toLowerCase(),
       Icon: ICON_MAP[link.platform.toLowerCase()] || FaQuestion,
+      customIcon: link.customIcon || null,
       url: link.url
     }));
+  }, [aboutData]);
 
-    // For simplicity, let's just use the defaults and override if dynamic exists
-    return defaults.map(def => {
-      const dynamic = dynamicLinks.find(d => d.platform === def.platform);
-      return dynamic || def;
-    });
-  }, [info]);
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   
@@ -176,10 +168,26 @@ const Contact = memo(() => {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-soft-dark hover:text-[#9929fb] transition-all duration-300 transform hover:scale-125 flex items-center justify-center w-10 h-10 rounded-full hover:bg-purple-50"
+                      className="group text-soft-dark hover:text-[#9929fb] transition-all duration-300 transform hover:scale-125 flex items-center justify-center w-10 h-10 rounded-full hover:bg-purple-50"
                       title={social.platform}
                     >
-                      <social.Icon size={20} />
+                      {social.customIcon ? (
+                        <div 
+                          className="w-[20px] h-[20px] bg-current transition-all"
+                          style={{
+                            WebkitMaskImage: `url(${social.customIcon})`,
+                            WebkitMaskSize: 'contain',
+                            WebkitMaskPosition: 'center',
+                            WebkitMaskRepeat: 'no-repeat',
+                            maskImage: `url(${social.customIcon})`,
+                            maskSize: 'contain',
+                            maskPosition: 'center',
+                            maskRepeat: 'no-repeat'
+                          }}
+                        />
+                      ) : (
+                        <social.Icon size={20} />
+                      )}
                     </a>
                   ))}
                 </div>

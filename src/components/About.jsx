@@ -10,6 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LazyImage } from './ui/Shared';
 import ResumeModal from './ui/ResumeModal';
 import aboutService from '../services/aboutService';
+import contactService from '../services/contactService';
 import { useCursor } from '../context/CursorContext';
 
 if (typeof window !== 'undefined') {
@@ -37,17 +38,22 @@ const ICON_MAP = {
   linkedin: FaLinkedinIn,
   github: FaGithub,
   twitter: FaXTwitter,
+  x: FaXTwitter,
   medium: FaMediumM,
   dribbble: FaDribbble,
   code360: Code360Icon,
   leetcode: SiLeetcode,
+  instagram: FaInstagram,
+  custom: FaLinkedinIn, // generic fallback
 };
+
 
 /**
  * About Component — ThoughtWorks-style GSAP ScrollTrigger animations
  */
 const About = memo(({ initialData }) => {
   const [aboutData, setAboutData] = useState(initialData || null);
+  const [contactInfo, setContactInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { setCursor } = useCursor();
@@ -63,8 +69,13 @@ const About = memo(({ initialData }) => {
 
   const fetchAboutData = async () => {
     try {
-      const data = await aboutService.getAboutData();
-      setAboutData(data);
+      // Fetch both in parallel — bio from About model, social links from Contact model
+      const [aboutResult, contactResult] = await Promise.all([
+        aboutService.getAboutData(),
+        contactService.getInfo().catch(() => null),
+      ]);
+      setAboutData(aboutResult);
+      setContactInfo(contactResult);
     } catch (err) {
       console.error('Failed to fetch about data:', err);
     } finally {
@@ -158,21 +169,24 @@ const About = memo(({ initialData }) => {
   // Only hide if NOT loading AND explicitly hidden by admin
   if (!isLoading && aboutData?.isVisible === false) return null;
 
-  const socialLinks = [
-    { platform: 'linkedin', icon: FaLinkedinIn, isPrimary: true, fallback: 'https://www.linkedin.com/in/navaneet-sharma-750b50357/' },
-    { platform: 'github', icon: FaGithub, fallback: 'https://github.com/navaneetsharma22' },
-    { platform: 'twitter', icon: FaXTwitter, fallback: 'https://x.com/NavaneetSh79884' },
-    { platform: 'code360', icon: Code360Icon, fallback: 'https://www.naukri.com/code360/profile/Navaneet' },
-    { platform: 'medium', icon: FaMediumM, fallback: 'https://medium.com/@navaneetsharma26' },
-    { platform: 'dribbble', icon: FaDribbble, fallback: 'https://dribbble.com/navaneet-sharma' },
-    { platform: 'leetcode', icon: SiLeetcode, fallback: 'https://leetcode.com/u/NavaneetSharma/' },
-  ].map(social => {
-    const dynamicLink = aboutData?.socialLinks?.find(l => l.platform.toLowerCase() === social.platform);
-    return {
-      ...social,
-      href: dynamicLink?.url || social.fallback || '#',
-    };
-  });
+  // Build social links — synced with Contact section (same source of truth)
+  // Priority: Contact Info links → About model links → empty (no broken hardcoded URLs)
+  const socialLinks = (() => {
+    const source = (aboutData?.socialLinks?.length > 0 && aboutData.socialLinks) || [];
+
+    return source.map(link => {
+      const platform = link.platform?.toLowerCase() || 'custom';
+      const IconComponent = ICON_MAP[platform] || FaLinkedinIn;
+      return {
+        platform,
+        icon: IconComponent,
+        customIcon: link.customIcon || null,
+        href: link.url || '#',
+      };
+    });
+  })();
+
+
 
   const resumeUrl = aboutData?.resumeUrl ? 
     (aboutData.resumeUrl.startsWith('http') ? aboutData.resumeUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}${aboutData.resumeUrl}`) 
@@ -251,10 +265,26 @@ const About = memo(({ initialData }) => {
                       rel="noopener noreferrer"
                       onMouseEnter={() => setCursor('hover')}
                       onMouseLeave={() => setCursor('default')}
-                      className="w-10 h-10 flex items-center justify-center text-[#1a1a1a]/60 hover:bg-[#9929fb] hover:text-white transition-all duration-300"
+                      className="group w-10 h-10 flex items-center justify-center rounded-full text-[#1a1a1a]/60 hover:bg-[#9929fb] hover:text-white transition-all duration-300"
                       aria-label={`Social link ${social.platform}`}
                     >
-                      <social.icon size={16} />
+                      {social.customIcon ? (
+                        <div 
+                          className="w-[18px] h-[18px] bg-current transition-all"
+                          style={{
+                            WebkitMaskImage: `url(${social.customIcon})`,
+                            WebkitMaskSize: 'contain',
+                            WebkitMaskPosition: 'center',
+                            WebkitMaskRepeat: 'no-repeat',
+                            maskImage: `url(${social.customIcon})`,
+                            maskSize: 'contain',
+                            maskPosition: 'center',
+                            maskRepeat: 'no-repeat'
+                          }}
+                        />
+                      ) : (
+                        <social.icon size={16} />
+                      )}
                     </a>
                   ))}
                 </div>
@@ -263,7 +293,7 @@ const About = memo(({ initialData }) => {
 
             {/* Right Side — Content */}
             <div className="lg:col-span-7 py-20 lg:py-28 px-6 lg:px-16 lg:pl-4 text-center lg:text-left">
-              <div className="max-w-[580px]">
+              <div className="w-full max-w-[700px]">
                 <h2 
                   ref={titleRef}
                   className="text-3xl md:text-[44px] font-bold text-heading leading-[1.1] mb-8 tracking-tight"
@@ -274,15 +304,16 @@ const About = memo(({ initialData }) => {
 
                 <div 
                   ref={descRef}
-                  className="space-y-6 text-base md:text-lg text-body leading-relaxed mb-10 opacity-80"
+                  className="space-y-6 text-base md:text-[17px] text-body leading-relaxed mb-10 opacity-80 text-justify"
                   style={{ opacity: 0 }}
                 >
                   <p>
-                    {aboutData?.description || 
-                      "I am a Full Stack MERN Developer specializing in high-performance web applications, cinematic UI designs, and scalable full-stack solutions. With a focus on modern technologies like Next.js, React, and Node.js, I bridge the gap between complex backend logic and pixel-perfect frontend experiences."}
+                    {(aboutData?.description || 
+                      "I am a Full Stack MERN Developer specializing in high-performance web applications, cinematic UI designs, and scalable full-stack solutions. With a focus on modern technologies like Next.js, React, and Node.js, I bridge the gap between complex backend logic and pixel-perfect frontend experiences."
+                    ).replace(/\*\*/g, '')}
                   </p>
                   <p>
-                    {aboutData?.description2 || "Passionate about creating stylish, modern websites and digital user experiences that leave a lasting impression."}
+                    {(aboutData?.description2 || "Passionate about creating stylish, modern websites and digital user experiences that leave a lasting impression.").replace(/\*\*/g, '')}
                   </p>
                 </div>
 

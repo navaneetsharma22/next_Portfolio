@@ -7,9 +7,10 @@ const aboutService = {
   },
   
   updateAboutData: async (aboutData) => {
-    const { data } = await api.post('/admin/about', aboutData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    // If FormData (file upload), use multipart; otherwise JSON
+    const isFormData = aboutData instanceof FormData;
+    const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+    const { data } = await api.post('/admin/about', aboutData, config);
     return data;
   }
 };

@@ -15,12 +15,16 @@ import {
   Wrench,
   LayoutDashboard,
   FolderKanban,
-  Sparkles
+  Sparkles,
+  Home,
+  UserCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
+  { name: 'Hero Section', icon: Home, path: '/admin/hero' },
+  { name: 'About Section', icon: UserCircle, path: '/admin/about' },
   { name: 'Projects', icon: FolderKanban, path: '/admin/projects' },
   { name: 'Experience', icon: Briefcase, path: '/admin/experience' },
   { name: 'Skills', icon: Sparkles, path: '/admin/skills' },

@@ -2,7 +2,7 @@ import React from 'react';
 import ClientHome from './ClientHome';
 import { siteConfig } from '@/config/site';
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 0; // Revalidate immediately so admin updates show instantly
 
 // ─── Dynamic per-page metadata (overrides layout defaults) ───
 // Google renders this for the homepage specifically.
@@ -46,12 +46,13 @@ async function getInitialData() {
   const API_URL = `${BACKEND_URL}/api`;
 
   try {
-    const [heroRes, aboutRes, projectsRes, expRes, skillsRes] = await Promise.all([
-      fetch(`${API_URL}/hero`,       { next: { revalidate: 3600 } }).catch(() => null),
-      fetch(`${API_URL}/about`,      { next: { revalidate: 3600 } }).catch(() => null),
-      fetch(`${API_URL}/projects`,   { next: { revalidate: 3600 } }).catch(() => null),
-      fetch(`${API_URL}/experience`, { next: { revalidate: 3600 } }).catch(() => null),
-      fetch(`${API_URL}/skills`,     { next: { revalidate: 3600 } }).catch(() => null),
+    const [heroRes, aboutRes, projectsRes, expRes, skillsRes, contactRes] = await Promise.all([
+      fetch(`${API_URL}/hero`,       { next: { revalidate: 0 } }).catch(() => null),
+      fetch(`${API_URL}/about`,      { next: { revalidate: 0 } }).catch(() => null),
+      fetch(`${API_URL}/projects`,   { next: { revalidate: 0 } }).catch(() => null),
+      fetch(`${API_URL}/experience`, { next: { revalidate: 0 } }).catch(() => null),
+      fetch(`${API_URL}/skills`,     { next: { revalidate: 0 } }).catch(() => null),
+      fetch(`${API_URL}/contact`,    { next: { revalidate: 0 } }).catch(() => null),
     ]);
 
     const heroJson     = heroRes     && heroRes.ok     ? await heroRes.json().catch(()     => null) : null;
@@ -59,6 +60,7 @@ async function getInitialData() {
     const projectsJson = projectsRes && projectsRes.ok ? await projectsRes.json().catch(() => null) : null;
     const expJson      = expRes      && expRes.ok      ? await expRes.json().catch(()      => null) : null;
     const skillsJson   = skillsRes   && skillsRes.ok   ? await skillsRes.json().catch(()   => null) : null;
+    const contactJson  = contactRes  && contactRes.ok  ? await contactRes.json().catch(()  => null) : null;
 
     // Process Experience — sort by order then date
     let experience = expJson?.data || expJson || [];
@@ -79,10 +81,11 @@ async function getInitialData() {
       projects:   projectsJson?.projects || projectsJson?.data || projectsJson || [],
       experience,
       skills,
+      contact: contactJson?.data || contactJson || null,
     };
   } catch (error) {
     console.error('SSR Fetch failed:', error);
-    return { hero: null, about: null, projects: [], experience: [], skills: [] };
+    return { hero: null, about: null, projects: [], experience: [], skills: [], contact: null };
   }
 }
 

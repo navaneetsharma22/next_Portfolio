@@ -178,12 +178,16 @@ const Hero = memo(({ initialData }) => {
     }
   }, []);
 
-  const phrases = [
-    'MERN Stack Developer',
-    'React Developer',
-    'Full Stack Engineer',
-    'Node.js Developer'
-  ];
+  const phrases = heroData?.typingPhrases?.length > 0
+    ? heroData.typingPhrases
+    : [
+        'MERN Stack Developer',
+        'React Developer',
+        'Full Stack Engineer',
+        'Node.js Developer'
+      ];
+
+  const hireMeUrl = heroData?.hireMeUrl || 'https://www.linkedin.com/in/navaneet-sharma-750b50357/';
 
   const resumeUrl = heroData?.resumeUrl ? 
     (heroData.resumeUrl.startsWith('http') ? heroData.resumeUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}${heroData.resumeUrl}`) 
@@ -270,7 +274,7 @@ const Hero = memo(({ initialData }) => {
               {/* Action Buttons */}
               <div ref={buttonsRef} className="flex flex-wrap gap-4 items-center justify-center lg:justify-start">
                 <button
-                  onClick={() => window.open('https://www.linkedin.com/in/navaneet-sharma-750b50357/', '_blank')}
+                  onClick={() => window.open(hireMeUrl, '_blank')}
                   onMouseEnter={() => setCursor('hover')}
                   onMouseLeave={() => setCursor('default')}
                   className="btn-picto !rounded-none py-4 px-10 group"
