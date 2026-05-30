@@ -7,9 +7,10 @@ const heroService = {
   },
   
   updateHeroData: async (heroData) => {
-    const { data } = await api.post('/admin/hero', heroData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    // If FormData (file upload), use multipart; otherwise JSON
+    const isFormData = heroData instanceof FormData;
+    const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+    const { data } = await api.post('/admin/hero', heroData, config);
     return data;
   }
 };

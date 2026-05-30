@@ -54,9 +54,9 @@ export default function ClientHome({ initialData }) {
             <Services />
             <Process />
             <CTA />
-            <Contact />
+            <Contact initialData={initialData} />
           </main>
-          <Footer />
+          <Footer initialData={initialData} />
           <ScrollToTop />
           <AIChatbot initialData={initialData} />
         </div>
