@@ -254,7 +254,7 @@ const About = memo(({ initialData }) => {
                 {/* Social Card */}
                 <div
                   ref={socialRef}
-                  className="absolute -bottom-6 lg:-bottom-8 left-1/2 lg:left-10 -translate-x-1/2 lg:translate-x-0 bg-white p-1.5 shadow-[0_15px_35px_rgba(0,0,0,0.1)] flex items-center gap-1 border border-border/5 w-max max-w-[90vw] overflow-x-auto no-scrollbar"
+                  className="absolute -bottom-6 lg:-bottom-8 left-1/2 -translate-x-1/2 bg-white p-2 shadow-[0_15px_35px_rgba(0,0,0,0.1)] flex items-center justify-center gap-2 border border-border/5 w-max max-w-[95%] overflow-x-auto no-scrollbar rounded-none"
                   style={{ opacity: 0 }}
                 >
                   {socialLinks.map((social, idx) => (
