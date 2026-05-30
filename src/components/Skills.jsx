@@ -117,10 +117,12 @@ const SkillCard = memo(({ skill, index, categoryColor }) => {
       {
         opacity: 1, y: 0, scale: 1,
         duration: 0.6, delay: index * 0.05, ease: 'power3.out',
+        immediateRender: false,
         scrollTrigger: {
           trigger: el,
           start: 'top 90%',
           toggleActions: 'play none none none',
+          onRefresh: (self) => { if (self.progress === 1) gsap.set(el, { opacity: 1, y: 0, scale: 1 }); },
         },
       }
     );
@@ -139,7 +141,7 @@ const SkillCard = memo(({ skill, index, categoryColor }) => {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         className="skill-card group relative cursor-pointer"
-        style={{ transition: 'transform 0.2s ease-out', opacity: 0 }}
+         style={{ transition: 'transform 0.2s ease-out', opacity: 0, willChange: 'transform, opacity' }}
       >
         {/* Gradient glow border */}
         <div
@@ -246,21 +248,30 @@ const SkillsHeader = memo(() => {
         gsap.fromTo(subtitleRef.current,
           { opacity: 0, y: 20 },
           { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out',
-            scrollTrigger: { trigger: subtitleRef.current, start: 'top 88%', toggleActions: 'play none none none' } }
+            immediateRender: false,
+            scrollTrigger: { trigger: subtitleRef.current, start: 'top 88%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(subtitleRef.current, { opacity: 1, y: 0 }); },
+            } }
         );
       }
       if (titleRef.current) {
         gsap.fromTo(titleRef.current,
           { opacity: 0, y: 40, clipPath: 'inset(0 0 100% 0)' },
           { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 1, delay: 0.1, ease: 'power4.out',
-            scrollTrigger: { trigger: titleRef.current, start: 'top 88%', toggleActions: 'play none none none' } }
+            immediateRender: false,
+            scrollTrigger: { trigger: titleRef.current, start: 'top 88%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(titleRef.current, { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }); },
+            } }
         );
       }
       if (descRef.current) {
         gsap.fromTo(descRef.current,
           { opacity: 0, y: 20 },
           { opacity: 1, y: 0, duration: 0.7, delay: 0.25, ease: 'power3.out',
-            scrollTrigger: { trigger: descRef.current, start: 'top 88%', toggleActions: 'play none none none' } }
+            immediateRender: false,
+            scrollTrigger: { trigger: descRef.current, start: 'top 88%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(descRef.current, { opacity: 1, y: 0 }); },
+            } }
         );
       }
     }, containerRef);
