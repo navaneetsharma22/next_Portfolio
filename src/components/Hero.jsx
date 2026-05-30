@@ -101,7 +101,7 @@ const Hero = memo(({ initialData }) => {
       if (badgeRef.current) {
         tl.fromTo(badgeRef.current,
           { opacity: 0, scale: 0.8, y: 15 },
-          { opacity: 1, scale: 1, y: 0, duration: 0.6 },
+          { opacity: 1, scale: 1, y: 0, duration: 0.6, immediateRender: false },
           0.2
         );
       }
@@ -110,7 +110,7 @@ const Hero = memo(({ initialData }) => {
       if (headingRef.current) {
         tl.fromTo(headingRef.current,
           { opacity: 0, y: 50, clipPath: 'inset(0 0 100% 0)' },
-          { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 1 },
+          { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 1, immediateRender: false },
           0.3
         );
       }
@@ -119,7 +119,7 @@ const Hero = memo(({ initialData }) => {
       if (typingRef.current) {
         tl.fromTo(typingRef.current,
           { opacity: 0, y: 25 },
-          { opacity: 1, y: 0, duration: 0.7 },
+          { opacity: 1, y: 0, duration: 0.7, immediateRender: false },
           0.55
         );
       }
@@ -128,7 +128,7 @@ const Hero = memo(({ initialData }) => {
       if (descRef.current) {
         tl.fromTo(descRef.current,
           { opacity: 0, y: 25 },
-          { opacity: 1, y: 0, duration: 0.7 },
+          { opacity: 1, y: 0, duration: 0.7, immediateRender: false },
           0.65
         );
       }
@@ -138,7 +138,7 @@ const Hero = memo(({ initialData }) => {
         const buttons = buttonsRef.current.children;
         tl.fromTo(buttons,
           { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, immediateRender: false },
           0.8
         );
       }
@@ -147,7 +147,7 @@ const Hero = memo(({ initialData }) => {
       if (imageContainerRef.current) {
         tl.fromTo(imageContainerRef.current,
           { opacity: 0, x: 60, scale: 0.95 },
-          { opacity: 1, x: 0, scale: 1, duration: 1 },
+          { opacity: 1, x: 0, scale: 1, duration: 1, immediateRender: false },
           0.3
         );
       }
@@ -231,7 +231,7 @@ const Hero = memo(({ initialData }) => {
               <div 
                 ref={badgeRef}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 border border-border/50 backdrop-blur-sm w-fit mb-8"
-                style={{ opacity: 0 }}
+                style={{ opacity: 0, willChange: 'transform, opacity' }}
               >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full bg-green-400 opacity-75"></span>
@@ -258,7 +258,7 @@ const Hero = memo(({ initialData }) => {
               <div 
                 ref={typingRef}
                 className="text-lg sm:text-xl md:text-2xl font-bold text-heading/80 mb-8 flex items-center gap-3"
-                style={{ opacity: 0 }}
+                style={{ opacity: 0, willChange: 'transform, opacity' }}
               >
                 I'm a <TypingAnimation phrases={phrases} />
               </div>
@@ -266,7 +266,7 @@ const Hero = memo(({ initialData }) => {
               <p 
                 ref={descRef}
                 className="text-lg leading-relaxed text-body mb-12 max-w-[520px]"
-                style={{ opacity: 0 }}
+                style={{ opacity: 0, willChange: 'transform, opacity' }}
               >
                 {heroData?.description || "Crafting high-performance web applications with the MERN stack. I turn complex problems into elegant, scalable digital solutions."}
               </p>
@@ -278,7 +278,7 @@ const Hero = memo(({ initialData }) => {
                   onMouseEnter={() => setCursor('hover')}
                   onMouseLeave={() => setCursor('default')}
                   className="btn-picto !rounded-none py-4 px-10 group"
-                  style={{ opacity: 0 }}
+                  style={{ opacity: 0, willChange: 'transform, opacity' }}
                 >
                   Hire Me
                   <Send size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -289,7 +289,7 @@ const Hero = memo(({ initialData }) => {
                   onMouseEnter={() => setCursor('hover')}
                   onMouseLeave={() => setCursor('default')}
                   className="btn-picto-outline"
-                  style={{ opacity: 0 }}
+                  style={{ opacity: 0, willChange: 'transform, opacity' }}
                 >
                   <FileText size={20} />
                   View Resume
@@ -304,7 +304,7 @@ const Hero = memo(({ initialData }) => {
           <div
             ref={imageContainerRef}
             className="relative"
-            style={{ opacity: 0 }}
+            style={{ opacity: 0, willChange: 'transform, opacity' }}
           >
             <div className="absolute inset-0 bg-primary/10 blur-3xl -z-10" />
             <div

@@ -99,7 +99,11 @@ const About = memo(({ initialData }) => {
           { opacity: 0, y: 80 },
           {
             opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-            scrollTrigger: { trigger: cardRef.current, start: 'top 88%', toggleActions: 'play none none none' },
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: cardRef.current, start: 'top 88%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(cardRef.current, { opacity: 1, y: 0 }); },
+            },
           }
         );
       }
@@ -111,7 +115,11 @@ const About = memo(({ initialData }) => {
           {
             opacity: 1, scale: 1, clipPath: 'inset(0% 0 0 0)',
             duration: 1.2, delay: 0.2, ease: 'power4.out',
-            scrollTrigger: { trigger: imageRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: imageRef.current, start: 'top 85%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(imageRef.current, { opacity: 1, scale: 1, clipPath: 'inset(0% 0 0 0)' }); },
+            },
           }
         );
       }
@@ -122,7 +130,11 @@ const About = memo(({ initialData }) => {
           { opacity: 0, y: 30, scale: 0.9 },
           {
             opacity: 1, y: 0, scale: 1, duration: 0.7, delay: 0.6, ease: 'back.out(1.4)',
-            scrollTrigger: { trigger: socialRef.current, start: 'top 90%', toggleActions: 'play none none none' },
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: socialRef.current, start: 'top 90%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(socialRef.current, { opacity: 1, y: 0, scale: 1 }); },
+            },
           }
         );
       }
@@ -134,7 +146,11 @@ const About = memo(({ initialData }) => {
           {
             opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)',
             duration: 0.9, delay: 0.3, ease: 'power4.out',
-            scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(titleRef.current, { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }); },
+            },
           }
         );
       }
@@ -145,7 +161,11 @@ const About = memo(({ initialData }) => {
           { opacity: 0, y: 25 },
           {
             opacity: 1, y: 0, duration: 0.7, delay: 0.5, ease: 'power3.out',
-            scrollTrigger: { trigger: descRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: descRef.current, start: 'top 85%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(descRef.current, { opacity: 1, y: 0 }); },
+            },
           }
         );
       }
@@ -157,7 +177,11 @@ const About = memo(({ initialData }) => {
           { opacity: 0, y: 20 },
           {
             opacity: 1, y: 0, duration: 0.5, stagger: 0.12, delay: 0.7, ease: 'power2.out',
-            scrollTrigger: { trigger: buttonsRef.current, start: 'top 90%', toggleActions: 'play none none none' },
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: buttonsRef.current, start: 'top 90%', toggleActions: 'play none none none',
+              onRefresh: (self) => { if (self.progress === 1) gsap.set(btns, { opacity: 1, y: 0 }); },
+            },
           }
         );
       }
@@ -234,7 +258,7 @@ const About = memo(({ initialData }) => {
         <div
           ref={cardRef}
           className="bg-white overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.08)] border border-white mx-2 sm:mx-0"
-          style={{ opacity: 0 }}
+          style={{ opacity: 0, willChange: 'transform, opacity' }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
             
@@ -242,7 +266,7 @@ const About = memo(({ initialData }) => {
             <div className="lg:col-span-5 py-16 lg:py-28 px-8 lg:px-16 flex justify-center lg:justify-start">
               <div className="relative w-full max-w-[480px]">
                 {/* Profile Image */}
-                <div ref={imageRef} className="overflow-hidden" style={{ opacity: 0 }}>
+                <div ref={imageRef} className="overflow-hidden" style={{ opacity: 0, willChange: 'transform, opacity, clip-path' }}>
                   <LazyImage
                     src={aboutData?.profileImage || "/assets/navaneet.jpg"}
                     alt={aboutData?.title || "About Me"}
@@ -255,7 +279,7 @@ const About = memo(({ initialData }) => {
                 <div
                   ref={socialRef}
                   className="absolute -bottom-6 lg:-bottom-8 left-1/2 -translate-x-1/2 bg-white p-2 shadow-[0_15px_35px_rgba(0,0,0,0.1)] flex items-center justify-center gap-2 border border-border/5 w-max max-w-[95%] overflow-x-auto no-scrollbar rounded-none"
-                  style={{ opacity: 0 }}
+                  style={{ opacity: 0, willChange: 'transform, opacity' }}
                 >
                   {socialLinks.map((social, idx) => (
                     <a
@@ -305,7 +329,7 @@ const About = memo(({ initialData }) => {
                 <div 
                   ref={descRef}
                   className="space-y-6 text-base md:text-[17px] text-body leading-relaxed mb-10 opacity-80 text-justify"
-                  style={{ opacity: 0 }}
+                  style={{ opacity: 0, willChange: 'transform, opacity' }}
                 >
                   <p>
                     {(aboutData?.description || 
@@ -323,7 +347,7 @@ const About = memo(({ initialData }) => {
                     onMouseEnter={() => setCursor('hover')}
                     onMouseLeave={() => setCursor('default')}
                     className="btn-picto !rounded-none py-3.5 px-8"
-                    style={{ opacity: 0 }}
+                    style={{ opacity: 0, willChange: 'transform, opacity' }}
                   >
                     My Projects
                   </button>
@@ -333,7 +357,7 @@ const About = memo(({ initialData }) => {
                     onMouseEnter={() => setCursor('hover')}
                     onMouseLeave={() => setCursor('default')}
                     className="btn-picto-outline"
-                    style={{ opacity: 0 }}
+                    style={{ opacity: 0, willChange: 'transform, opacity' }}
                   >
                     <FileText size={20} />
                     View Resume

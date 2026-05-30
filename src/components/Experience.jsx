@@ -49,6 +49,7 @@ const Experience = ({ initialData }) => {
           { scaleY: 0, transformOrigin: 'top center' },
           {
             scaleY: 1, duration: 1.5, ease: 'power2.inOut',
+            immediateRender: false,
             scrollTrigger: {
               trigger: lineRef.current,
               start: 'top 80%',
@@ -69,10 +70,12 @@ const Experience = ({ initialData }) => {
             {
               opacity: 1, x: 0, y: 0,
               duration: 0.8, ease: 'power3.out',
+              immediateRender: false,
               scrollTrigger: {
                 trigger: card,
                 start: 'top 85%',
                 toggleActions: 'play none none none',
+                onRefresh: (self) => { if (self.progress === 1) gsap.set(card, { opacity: 1, x: 0, y: 0 }); },
               },
             }
           );
@@ -86,10 +89,12 @@ const Experience = ({ initialData }) => {
             {
               opacity: 1, scale: 1,
               duration: 0.5, ease: 'back.out(2)',
+              immediateRender: false,
               scrollTrigger: {
                 trigger: dot,
                 start: 'top 85%',
                 toggleActions: 'play none none none',
+                onRefresh: (self) => { if (self.progress === 1) gsap.set(dot, { opacity: 1, scale: 1 }); },
               },
             }
           );
@@ -103,10 +108,12 @@ const Experience = ({ initialData }) => {
             {
               opacity: 1, y: 0,
               duration: 0.6, delay: 0.2, ease: 'power2.out',
+              immediateRender: false,
               scrollTrigger: {
                 trigger: label,
                 start: 'top 85%',
                 toggleActions: 'play none none none',
+                onRefresh: (self) => { if (self.progress === 1) gsap.set(label, { opacity: 1, y: 0 }); },
               },
             }
           );

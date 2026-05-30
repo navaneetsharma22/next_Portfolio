@@ -63,6 +63,9 @@ const SmoothScroll = ({ children }) => {
     gsap.ticker.add(rafCallback);
     gsap.ticker.lagSmoothing(0); // Prevent GSAP from compensating for lag
 
+    // Refresh ScrollTrigger after Lenis is set up so trigger positions are accurate
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+
     // ── Robust Scroll Restoration on Refresh ──
     const scrollKey = `scrollPos-${pathname}`;
     const savedPosition = sessionStorage.getItem(scrollKey);

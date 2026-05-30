@@ -93,10 +93,12 @@ const Footer = memo(({ initialData }) => {
         { opacity: 0, y: 30 },
         {
           opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+          immediateRender: false,
           scrollTrigger: {
             trigger: footerRef.current,
             start: 'top 90%',
             toggleActions: 'play none none none',
+            onRefresh: (self) => { if (self.progress === 1) gsap.set(contentRef.current, { opacity: 1, y: 0 }); },
           },
         }
       );
@@ -117,7 +119,7 @@ const Footer = memo(({ initialData }) => {
       style={{ backgroundColor: '#132238', paddingTop: '200px' }}
       role="contentinfo"
     >
-      <div ref={contentRef} className="mx-auto px-6 w-full" style={{ maxWidth: '1320px', opacity: 0 }}>
+      <div ref={contentRef} className="mx-auto px-6 w-full" style={{ maxWidth: '1320px', opacity: 0, willChange: 'transform, opacity' }}>
 
         {/* Top row */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 mb-10">
