@@ -37,10 +37,7 @@ const SmoothScroll = ({ children }) => {
     }
 
     const lenis = new Lenis({
-      duration: 0.8,
-      easing: (t) => 1 - Math.pow(1 - t, 3), // cubic ease-out — snappy, no jerk
-      direction: 'vertical',
-      gestureDirection: 'vertical',
+      lerp: 0.08, // Adjust for momentum smoothness (lower = smoother/more momentum)
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
@@ -51,17 +48,21 @@ const SmoothScroll = ({ children }) => {
     window.lenis = lenis;
 
     // ── Sync Lenis with GSAP ScrollTrigger ──
-    // This prevents jerk: Lenis tells ScrollTrigger where scroll is
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Use GSAP ticker for Lenis instead of rAF (smoother + synced)
-    // Store the RAF wrapper so we can remove the exact same function on cleanup
-    const rafCallback = (time) => lenis.raf(time * 1000);
-    // save to ref so cleanup can access it
-    lenisRef.current = lenisRef.current || {};
-    lenisRef.current.rafCallback = rafCallback;
-    gsap.ticker.add(rafCallback);
-    gsap.ticker.lagSmoothing(0); // Prevent GSAP from compensating for lag
+    // Standard robust requestAnimationFrame for Lenis (avoids GSAP ticker glitches on mobile/deployment)
+    let rafId;
+    function raf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+
+    // Watch for document height changes to refresh ScrollTrigger automatically
+    const resizeObserver = new ResizeObserver(() => {
+      ScrollTrigger.refresh();
+    });
+    resizeObserver.observe(document.body);
 
     // Refresh ScrollTrigger after Lenis is set up so trigger positions are accurate
     requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -105,18 +106,11 @@ const SmoothScroll = ({ children }) => {
     return () => {
       window.removeEventListener('beforeunload', saveScrollPosition);
       window.removeEventListener('load', handleLoad);
+      resizeObserver.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+      
       try {
         lenis.off('scroll', ScrollTrigger.update);
-        // remove the exact raf callback we added
-        if (lenisRef.current && lenisRef.current.rafCallback) {
-          gsap.ticker.remove(lenisRef.current.rafCallback);
-        } else {
-          gsap.ticker.remove(lenis.raf);
-        }
-      } catch (e) {
-        // ignore
-      }
-      try {
         lenis.destroy();
       } catch (e) {
         // ignore
