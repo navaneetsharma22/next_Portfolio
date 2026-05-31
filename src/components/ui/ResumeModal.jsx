@@ -41,18 +41,6 @@ const ResumeModal = ({ isOpen, onClose, resumeUrl }) => {
     if (!resumeUrl) return;
     
     let downloadUrl = resumeUrl;
-    // Convert common Google Drive share links to direct download
-    try {
-      if (downloadUrl.includes('drive.google.com')) {
-        const idMatch = downloadUrl.match(/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/);
-        if (idMatch && idMatch[1]) {
-          downloadUrl = `https://drive.google.com/uc?export=download&id=${idMatch[1]}`;
-        }
-      }
-    } catch (e) {
-      // fallback to original URL
-      downloadUrl = resumeUrl;
-    }
     
     if (downloadUrl.includes('cloudinary.com') && downloadUrl.includes('/upload/')) {
       if (!downloadUrl.includes('fl_attachment')) {

@@ -40,7 +40,7 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
       scale: 1,
       duration: 1,
       delay: index * 0.12,
-      ease: 'power3.out',
+      ease: 'back.out(1.2)',
       scrollTrigger: {
         trigger: card,
         start: 'top 88%',
@@ -90,7 +90,7 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
       rotateY,
       transformPerspective: 1000,
       duration: 0.4,
-      ease: 'power2.out',
+      ease: 'power3.out',
     });
   }, []);
 
@@ -101,7 +101,7 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
       gsap.to(imageRef.current, {
         scale: 1.06,
         duration: 0.7,
-        ease: 'power2.out',
+        ease: 'power3.out',
       });
     }
     // Overlay reveal
@@ -109,7 +109,7 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
       gsap.to(overlayRef.current, {
         opacity: 1,
         duration: 0.4,
-        ease: 'power2.out',
+        ease: 'power3.out',
       });
     }
   }, [setCursor]);
@@ -122,7 +122,7 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
         rotateX: 0,
         rotateY: 0,
         duration: 0.6,
-        ease: 'power2.out',
+        ease: 'power3.out',
       });
     }
     // Image un-zoom
@@ -130,7 +130,7 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
       gsap.to(imageRef.current, {
         scale: 1,
         duration: 0.7,
-        ease: 'power2.out',
+        ease: 'power3.out',
       });
     }
     // Overlay hide
@@ -138,7 +138,7 @@ const ProjectCard = memo(({ project, index, onOpenDetails }) => {
       gsap.to(overlayRef.current, {
         opacity: 0,
         duration: 0.4,
-        ease: 'power2.out',
+        ease: 'power3.out',
       });
     }
   }, [setCursor]);

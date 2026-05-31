@@ -69,7 +69,7 @@ const Experience = ({ initialData }) => {
             { opacity: 0, x: isEven ? 50 : -50, y: 30 },
             {
               opacity: 1, x: 0, y: 0,
-              duration: 0.8, ease: 'power3.out',
+              duration: 0.8, ease: 'back.out(1.2)',
               immediateRender: false,
               scrollTrigger: {
                 trigger: card,
@@ -107,7 +107,7 @@ const Experience = ({ initialData }) => {
             { opacity: 0, y: 15 },
             {
               opacity: 1, y: 0,
-              duration: 0.6, delay: 0.2, ease: 'power2.out',
+              duration: 0.6, delay: 0.2, ease: 'power3.out',
               immediateRender: false,
               scrollTrigger: {
                 trigger: label,

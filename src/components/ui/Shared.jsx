@@ -58,7 +58,7 @@ export const SectionHeader = ({ subtitle, title, description, align = 'left', cl
       // Subtitle — fade up
       createAnim(subtitleRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' });
       // Title — clip-path reveal
-      createAnim(titleRef.current, { opacity: 0, y: 35, clipPath: 'inset(0 0 100% 0)' }, { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.9, delay: 0.1, ease: 'power4.out' });
+      createAnim(titleRef.current, { opacity: 0, y: 35, clipPath: 'inset(0 0 100% 0)' }, { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.9, delay: 0.1, ease: 'power3.out' });
       // Divider — width expand
       createAnim(dividerRef.current, { scaleX: 0, transformOrigin: align === 'center' ? 'center' : 'left' }, { scaleX: 1, duration: 0.7, delay: 0.25, ease: 'power3.inOut' });
       // Description — fade up

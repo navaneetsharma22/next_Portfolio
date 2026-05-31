@@ -24,16 +24,11 @@ export default function ClientHome({ initialData }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user has already seen the preloader in this session
-    const hasSeenPreloader = sessionStorage.getItem('preloader_seen');
-    if (hasSeenPreloader) {
-      setIsLoading(false);
-    }
+    // Preloader always shows on visit to ensure it loads first
   }, []);
 
   const handlePreloaderComplete = () => {
     setIsLoading(false);
-    sessionStorage.setItem('preloader_seen', 'true');
   };
 
   return (
