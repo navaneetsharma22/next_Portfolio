@@ -72,7 +72,7 @@ const ProjectSection = memo(({ initialData }) => {
             y: 0,
             clipPath: 'inset(0 0 0% 0)',
             duration: 1,
-            ease: 'power4.out',
+            ease: 'power3.out',
             scrollTrigger: {
               trigger: headingRef.current,
               start: 'top 85%',
@@ -170,7 +170,7 @@ const ProjectSection = memo(({ initialData }) => {
             y: 0,
             duration: 0.5,
             stagger: 0.06,
-            ease: 'power2.out',
+            ease: 'power3.out',
             scrollTrigger: {
               trigger: filtersRef.current,
               start: 'top 88%',

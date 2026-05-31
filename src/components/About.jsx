@@ -114,7 +114,7 @@ const About = memo(({ initialData }) => {
           { opacity: 0, scale: 1.1, clipPath: 'inset(100% 0 0 0)' },
           {
             opacity: 1, scale: 1, clipPath: 'inset(0% 0 0 0)',
-            duration: 1.2, delay: 0.2, ease: 'power4.out',
+            duration: 1.2, delay: 0.2, ease: 'power3.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: imageRef.current, start: 'top 85%', toggleActions: 'play none none none',
@@ -129,7 +129,7 @@ const About = memo(({ initialData }) => {
         gsap.fromTo(socialRef.current,
           { opacity: 0, y: 30, scale: 0.9 },
           {
-            opacity: 1, y: 0, scale: 1, duration: 0.7, delay: 0.6, ease: 'back.out(1.4)',
+            opacity: 1, y: 0, scale: 1, duration: 0.7, delay: 0.6, ease: 'power3.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: socialRef.current, start: 'top 90%', toggleActions: 'play none none none',
@@ -145,7 +145,7 @@ const About = memo(({ initialData }) => {
           { opacity: 0, y: 40, clipPath: 'inset(0 0 100% 0)' },
           {
             opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)',
-            duration: 0.9, delay: 0.3, ease: 'power4.out',
+            duration: 0.9, delay: 0.3, ease: 'power3.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none none',
@@ -176,7 +176,7 @@ const About = memo(({ initialData }) => {
         gsap.fromTo(btns,
           { opacity: 0, y: 20 },
           {
-            opacity: 1, y: 0, duration: 0.5, stagger: 0.12, delay: 0.7, ease: 'power2.out',
+            opacity: 1, y: 0, duration: 0.5, stagger: 0.12, delay: 0.7, ease: 'power3.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: buttonsRef.current, start: 'top 90%', toggleActions: 'play none none none',

@@ -214,12 +214,12 @@ const ResumeControl = () => {
             </div>
           </AdminCard>
 
-          <AdminCard title="Manual Resume Link" subtitle="Paste a direct link (e.g. Google Drive, Dropbox)">
+          <AdminCard title="Manual Resume Link" subtitle="Paste a direct Cloudinary URL">
             <div className="space-y-4">
               <div className="relative">
                 <input
                   type="url"
-                  placeholder="https://drive.google.com/..."
+                  placeholder="https://res.cloudinary.com/..."
                   value={manualUrl}
                   onChange={(e) => {
                     setManualUrl(e.target.value);
