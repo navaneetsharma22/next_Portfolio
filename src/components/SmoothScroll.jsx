@@ -50,13 +50,14 @@ const SmoothScroll = ({ children }) => {
     // ── Sync Lenis with GSAP ScrollTrigger ──
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Standard robust requestAnimationFrame for Lenis (avoids GSAP ticker glitches on mobile/deployment)
-    let rafId;
-    function raf(time) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
+    // Sync Lenis with GSAP Ticker for smooth scroll-driven animations
+    // This eliminates jitter between GSAP animations and Lenis scrolling
+    const update = (time) => {
+      lenis.raf(time * 1000);
+    };
+    
+    gsap.ticker.add(update);
+    gsap.ticker.lagSmoothing(0);
 
     // Watch for document height changes to refresh ScrollTrigger automatically
     const resizeObserver = new ResizeObserver(() => {
@@ -107,7 +108,7 @@ const SmoothScroll = ({ children }) => {
       window.removeEventListener('beforeunload', saveScrollPosition);
       window.removeEventListener('load', handleLoad);
       resizeObserver.disconnect();
-      if (rafId) cancelAnimationFrame(rafId);
+      gsap.ticker.remove(update);
       
       try {
         lenis.off('scroll', ScrollTrigger.update);
